@@ -32,6 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...tapi .env.example WAJIB ikut ter-commit: isinya cuma nama variabel tanpa
+# nilai rahasia, dan itu kontrak env buat seluruh tim.
+!.env.example
+
+# prisma client hasil generate - jangan di-commit, tiap orang generate sendiri
+# lewat `npm install` (otomatis via script postinstall)
+/src/generated/
 
 # vercel
 .vercel
@@ -39,3 +46,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.neon

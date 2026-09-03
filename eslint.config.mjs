@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Prisma client hasil generate: kode buatan mesin, tidak di-commit,
+    // dan tidak bisa kita perbaiki. Tanpa baris ini, `npm run lint`
+    // memuntahkan ratusan error yang tidak ada hubungannya dengan kode kita.
+    "src/generated/**",
   ]),
 ]);
 
