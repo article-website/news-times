@@ -21,7 +21,7 @@ import type {
  *
  * BATAS TANGGUNG JAWAB - penting dibaca Orang 3 & 4:
  *
- * Lapisan ini murni simpan-ambil. Dia TIDAK mengurus:
+ * Bagian database ini murni simpan-ambil. Dia TIDAK mengurus:
  *   - membuat slug dari judul       -> service, punya Orang 4
  *   - validasi isi form             -> Zod, punya Orang 4
  *   - upload gambar ke Blob         -> punya Orang 3; simpan URL hasilnya saja

@@ -5,7 +5,7 @@ import type {
 } from "@/server/domain/user";
 
 /**
- * Kontrak akses data akun admin. Dipakai Orang 3 di src/server/auth/.
+ * Kesepakatan cara mengambil data akun admin. Dipakai Orang 3 di src/server/auth/.
  *
  * Cara pakainya waktu login:
  *
@@ -16,7 +16,7 @@ import type {
  *   return toPublic(user);
  *
  * CATATAN KEAMANAN: fungsi `verifikasiPassword` di atas BUKAN bagian dari
- * lapisan ini - itu punyamu, Orang 3. Repository ini sengaja tidak tahu
+ * bagian database ini - itu punyamu, Orang 3. Repository ini sengaja tidak tahu
  * algoritma hash apa pun.
  *
  * Satu saran (bukan keharusan): balas dengan pesan error yang sama untuk

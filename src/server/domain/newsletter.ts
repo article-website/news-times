@@ -3,12 +3,12 @@
  *
  * BATAS TANGGUNG JAWAB - penting dibaca Orang 4:
  *
- * Lapisan ini cuma menyimpan. Dia TIDAK melakukan:
+ * Bagian database ini cuma menyimpan. Dia TIDAK melakukan:
  *   - validasi format email      -> itu Zod, punyamu
  *   - pembatasan laju (anti spam) -> itu di route handler, punyamu
  *   - pengiriman email konfirmasi -> layanan luar, punyamu
  *
- * Satu hal yang DIURUS lapisan ini: email yang sudah pernah daftar tidak
+ * Satu hal yang DIURUS bagian database ini: email yang sudah pernah daftar tidak
  * bikin error, tapi dianggap "sudah terdaftar". Lihat SubscribeResult.
  *
  * Pemilik: Orang 1 (Database)

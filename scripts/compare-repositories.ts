@@ -3,7 +3,7 @@
  *
  * Ini pembuktian inti desain: kalau kedua implementasi mengembalikan hasil yang
  * sama persis, berarti halaman tidak perlu diubah sama sekali waktu pindah dari
- * data palsu ke database asli.
+ * data contoh ke database asli.
  *
  * Jalankan: npx tsx --conditions=react-server scripts/... (lihat npm script)
  */
@@ -37,11 +37,11 @@ function cek(nama: string, a: unknown, b: unknown) {
  *   viewCount  - berubah tiap artikel dibaca, jadi angkanya bergerak sendiri.
  *
  *   updatedAt  - database mencatat kapan baris terakhir benar-benar diedit.
- *                Data palsu tidak punya informasi itu sama sekali, jadi dia
+ *                Data contoh tidak punya informasi itu sama sekali, jadi dia
  *                memakai tanggal terbit sebagai pengganti. Sampai sekarang
  *                belum ada halaman yang memakai field ini; kalau nanti dipakai
  *                (misal label "diperbarui pada"), ambil datanya dari database,
- *                jangan dari data palsu.
+ *                jangan dari data contoh.
  */
 const FIELD_DIKECUALIKAN = new Set(["viewCount", "updatedAt"]);
 

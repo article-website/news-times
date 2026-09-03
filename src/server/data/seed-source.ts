@@ -4,7 +4,7 @@ import { articles as legacyArticles } from "@/data/articles";
  * Menjembatani data lama (src/data/articles.ts) ke bentuk data yang baru.
  *
  * Dipakai dua tempat:
- *   1. Repository palsu (in-memory) selama database belum jadi.
+ *   1. Versi data contoh (in-memory) selama database belum jadi.
  *   2. Script seed, buat ngisi database asli.
  *
  * CATATAN BUAT TIM: src/data/articles.ts sengaja TIDAK diubah sama sekali,

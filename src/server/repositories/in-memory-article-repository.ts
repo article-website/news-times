@@ -16,7 +16,7 @@ import {
 import type { ArticleRepository } from "./article-repository";
 
 /**
- * Implementasi PALSU dari ArticleRepository, isinya cuma array di memori.
+ * Versi DATA CONTOH dari ArticleRepository, isinya cuma array di memori.
  *
  * Gunanya: Orang 2, 3, dan 4 bisa langsung ngoding di Sprint 1 tanpa nunggu
  * database Neon jadi. Begitu database siap, tinggal ganti satu baris di

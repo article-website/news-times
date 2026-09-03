@@ -3,7 +3,7 @@
  *
  * Rangkaian uji yang SAMA dijalankan dua kali: sekali pada implementasi palsu,
  * sekali pada Prisma. Kalau keduanya lulus, berarti perilakunya konsisten dan
- * Orang 3 & 4 bisa ngoding pakai data palsu tanpa takut hasilnya beda waktu
+ * Orang 3 & 4 bisa ngoding pakai data contoh tanpa takut hasilnya beda waktu
  * pindah ke database.
  *
  * Uji Prisma menulis ke database sungguhan, lalu MEMBERSIHKAN sendiri barisnya
@@ -201,7 +201,7 @@ async function bersihkanPrisma() {
 }
 
 async function main() {
-  await jalankan("IN-MEMORY (data palsu)", {
+  await jalankan("IN-MEMORY (data contoh)", {
     userRepo: inMemoryUserRepository,
     newsletterRepo: inMemoryNewsletterRepository,
     adminRepo: inMemoryArticleAdminRepository,

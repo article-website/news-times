@@ -31,7 +31,7 @@ export type { UserRepository } from "./user-repository";
  * Ini "satu baris" yang disebut di rencana kerja Sprint 2.
  * Diatur lewat variabel DATA_SOURCE di file .env.local:
  *
- *   DATA_SOURCE=memory   -> pakai data palsu (default, buat Sprint 1)
+ *   DATA_SOURCE=memory   -> pakai data contoh (default, buat Sprint 1)
  *   DATA_SOURCE=prisma   -> pakai database Neon beneran
  *
  * Default sengaja "memory" supaya orang baru yang clone repo ini bisa langsung
@@ -49,7 +49,7 @@ function bacaSumberData(): SumberData {
   }
 
   // Salah ketik di .env lebih baik ketahuan langsung daripada diam-diam
-  // jalan pakai data palsu di produksi.
+  // jalan pakai data contoh di produksi.
   throw new Error(
     `DATA_SOURCE="${nilai}" tidak dikenali. Isi dengan "memory" atau "prisma".`,
   );

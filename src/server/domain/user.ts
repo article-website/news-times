@@ -5,7 +5,7 @@
  *
  * BATAS TANGGUNG JAWAB - penting dibaca Orang 3:
  *
- * Lapisan ini cuma menyimpan dan mengambil `passwordHash` apa adanya.
+ * Bagian database ini cuma menyimpan dan mengambil `passwordHash` apa adanya.
  * Dia TIDAK tahu dan TIDAK ikut menentukan:
  *   - algoritma hash yang dipakai (bcrypt? argon2? scrypt?)
  *   - berapa lama sesi berlaku

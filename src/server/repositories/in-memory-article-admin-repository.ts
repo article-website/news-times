@@ -19,7 +19,7 @@ import type {
 } from "./article-admin-repository";
 
 /**
- * Implementasi palsu ArticleAdminRepository.
+ * Versi data contoh ArticleAdminRepository.
  *
  * Diisi 5 artikel yang sama dengan repository publik, supaya waktu Orang 3
  * membuka tabel admin isinya tidak kosong dan bisa langsung dicoba tombol

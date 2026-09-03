@@ -1,7 +1,7 @@
 import type { Subscriber, SubscribeResult } from "@/server/domain/newsletter";
 
 /**
- * Kontrak akses data newsletter. Dipakai Orang 4 di src/app/api/newsletter/.
+ * Kesepakatan cara mengambil data newsletter. Dipakai Orang 4 di src/app/api/newsletter/.
  *
  * Cara pakainya di route handler:
  *

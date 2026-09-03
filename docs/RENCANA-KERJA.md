@@ -150,14 +150,15 @@ Prisma sama sekali, dan perintah `npm run db:seed` bisa ngisi ulang database dar
 
 > ### ✅ Bagian ini SUDAH SELESAI
 >
-> Cara memakainya ada di **[LAPISAN-DATA.md](./LAPISAN-DATA.md)** — baca itu sebelum
+> Cara memakainya ada di **[DATABASE.md](./DATABASE.md)** — baca itu sebelum
 > mulai ngoding bagianmu.
 >
-> Ringkasnya: **kamu tidak butuh database untuk mulai bekerja.** Cukup
-> `cp .env.example .env.local` lalu `npm run dev`, dan data palsunya sudah jalan.
+> Ringkasnya: **kamu tidak perlu punya database sendiri untuk mulai bekerja.**
+> Cukup `cp .env.example .env.local` lalu `npm run dev`, dan data contohnya
+> sudah jalan.
 >
-> Empat pintu yang tersedia: `articleRepo` (Orang 2), `articleAdminRepo` dan
-> `userRepo` (Orang 3), `newsletterRepo` (Orang 4).
+> Empat kumpulan fungsi yang tersedia: `articleRepo` (Orang 2),
+> `articleAdminRepo` dan `userRepo` (Orang 3), `newsletterRepo` (Orang 4).
 
 ---
 

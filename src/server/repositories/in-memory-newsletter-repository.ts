@@ -2,7 +2,7 @@ import type { Subscriber, SubscribeResult } from "@/server/domain/newsletter";
 import type { NewsletterRepository } from "./newsletter-repository";
 
 /**
- * Implementasi palsu NewsletterRepository.
+ * Versi data contoh NewsletterRepository.
  * Data hilang tiap server restart - itu wajar, ini memang cuma buat Sprint 1.
  *
  * Pemilik: Orang 1 (Database)

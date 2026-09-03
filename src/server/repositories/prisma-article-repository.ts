@@ -13,10 +13,10 @@ import { getPrisma } from "@/server/db/client";
 import type { ArticleRepository } from "./article-repository";
 
 /**
- * Implementasi ASLI dari ArticleRepository, pakai Prisma + PostgreSQL.
+ * Versi DATABASE ASLI dari ArticleRepository, pakai Prisma + PostgreSQL.
  *
  * Bentuk balikannya wajib sama persis dengan versi in-memory. Kalau ada beda
- * sedikit saja, halaman yang tadinya jalan pakai data palsu bakal rusak waktu
+ * sedikit saja, halaman yang tadinya jalan pakai data contoh bakal rusak waktu
  * ditukar ke database asli.
  *
  * Pemilik: Orang 1 (Database)

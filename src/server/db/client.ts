@@ -34,7 +34,7 @@ const globalForPrisma = globalThis as unknown as {
  * Sengaja berbentuk FUNGSI, bukan `export const prisma = ...`.
  *
  * Alasannya: kalau berbentuk const, koneksi dibuat begitu file ini di-import.
- * Padahal selama Sprint 1 kita masih pakai data palsu dan DATABASE_URL belum
+ * Padahal selama Sprint 1 kita masih pakai data contoh dan DATABASE_URL belum
  * di-set. Akibatnya seluruh aplikasi error cuma gara-gara ada file yang
  * meng-import file ini, walaupun databasenya belum dipakai sama sekali.
  *

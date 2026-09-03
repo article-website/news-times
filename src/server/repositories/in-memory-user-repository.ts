@@ -6,7 +6,7 @@ import type {
 import type { UserRepository } from "./user-repository";
 
 /**
- * Implementasi palsu UserRepository, isinya array di memori.
+ * Versi data contoh UserRepository, isinya array di memori.
  *
  * Sengaja dimulai KOSONG - tidak ada akun bawaan sama sekali.
  *

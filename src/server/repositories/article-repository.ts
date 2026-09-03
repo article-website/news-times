@@ -8,7 +8,7 @@ import type {
 
 /**
  * ============================================================================
- * KONTRAK UTAMA PROYEK INI
+ * KESEPAKATAN UTAMA PROYEK INI
  * ============================================================================
  *
  * Ini satu-satunya cara halaman dan API boleh mengambil data artikel.
