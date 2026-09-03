@@ -1,0 +1,79 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const navItems = [
+  { label: "Beranda", href: "/" },
+  { label: "Nasional", href: "#" },
+  { label: "Internasional", href: "#" },
+  { label: "Ekonomi", href: "#" },
+  { label: "Teknologi", href: "#" },
+  { label: "Olahraga", href: "#" },
+  { label: "Lifestyle", href: "#" },
+];
+
+export default function Navbar() {
+  const pathname = usePathname();
+
+  return (
+    <header className="border-b border-gray-200 bg-white">
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+        <Link href="/" className="text-xl font-bold text-gray-900">
+          News<span className="text-blue-600">Times</span>
+        </Link>
+
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={
+                pathname === item.href
+                  ? "text-blue-600"
+                  : "text-gray-700 hover:text-blue-600 transition-colors"
+              }
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-4">
+          <button
+            aria-label="Cari"
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
+          <button
+            aria-label="Akun"
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
