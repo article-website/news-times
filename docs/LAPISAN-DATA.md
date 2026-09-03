@@ -269,6 +269,12 @@ npm run verify:all      # 94 cek pada user, newsletter, admin artikel
 `npm run db:reset` menghapus seluruh isi database secara permanen. Jangan
 pernah dijalankan ke database produksi.
 
+> **Catatan Prisma 7:** `prisma migrate reset` tidak lagi menjalankan seed
+> otomatis seperti versi sebelumnya. Kalau kamu menjalankan perintah Prisma-nya
+> langsung (bukan lewat `npm run db:reset`), databasemu akan kosong melompong
+> dan harus di-seed manual. Script `db:reset` di `package.json` sudah
+> menyambungnya: `prisma migrate reset && prisma db seed`.
+
 ---
 
 ## Perbedaan yang diketahui antara data palsu dan database

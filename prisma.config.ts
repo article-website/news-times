@@ -34,6 +34,14 @@ export default defineConfig({
   },
 
   migrations: {
+    // Perintah yang dipakai `prisma db seed`.
+    //
+    // CATATAN: di Prisma 7, `prisma migrate reset` TIDAK lagi memanggil seed
+    // ini otomatis (flag --skip-seed juga sudah hilang dari bantuannya).
+    // Terbukti di lapangan: setelah reset, seluruh tabel kosong.
+    //
+    // Karena itu script db:reset di package.json menyambungnya sendiri:
+    //   "db:reset": "prisma migrate reset && prisma db seed"
     seed: "tsx prisma/seed.ts",
   },
 });

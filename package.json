@@ -14,7 +14,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset",
+    "db:reset": "prisma migrate reset && prisma db seed",
     "verify:repo": "tsx scripts/verify-article-repository.ts",
     "verify:compare": "tsx --conditions=react-server scripts/compare-repositories.ts",
     "verify:all": "tsx --conditions=react-server scripts/verify-all-repositories.ts"
