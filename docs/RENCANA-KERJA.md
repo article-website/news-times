@@ -146,7 +146,18 @@ Tugas:
 - Bikin fungsi ambil data + versi palsunya buat dipakai teman-teman
 
 **Dianggap selesai kalau:** orang lain bisa panggil `articleRepo.findBySlug()` tanpa perlu tahu
-Prisma sama sekali, dan perintah `npm run seed` bisa ngisi ulang database dari nol.
+Prisma sama sekali, dan perintah `npm run db:seed` bisa ngisi ulang database dari nol.
+
+> ### ✅ Bagian ini SUDAH SELESAI
+>
+> Cara memakainya ada di **[LAPISAN-DATA.md](./LAPISAN-DATA.md)** — baca itu sebelum
+> mulai ngoding bagianmu.
+>
+> Ringkasnya: **kamu tidak butuh database untuk mulai bekerja.** Cukup
+> `cp .env.example .env.local` lalu `npm run dev`, dan data palsunya sudah jalan.
+>
+> Empat pintu yang tersedia: `articleRepo` (Orang 2), `articleAdminRepo` dan
+> `userRepo` (Orang 3), `newsletterRepo` (Orang 4).
 
 ---
 
@@ -217,7 +228,7 @@ Tugas:
 
 - **Hari 1:** daftar Vercel, naikin repo apa adanya, dapatkan link online
 - Setting GitHub Actions biar tiap PR otomatis dicek (lint, cek tipe, build)
-- Kelola variabel rahasia (`.env`) buat preview dan produksi
+- Kelola variabel rahasia (`.env.local`) buat preview dan produksi
 - Pasang Vitest buat tes logika, Playwright buat tes alur (misal: buka artikel, login, terbitkan)
 - Cek kecepatan pakai Lighthouse, cek aksesibilitas, cek error di console
 - Nyalakan proteksi branch `main`, tulis README dan panduan cara rilis
@@ -331,8 +342,8 @@ di README.
    nanti kode orang lain rusak.
 4. **PR jangan kegedean.** Usahakan di bawah 400 baris. PR 2000 baris pasti cuma di-approve
    tanpa dibaca.
-5. **File `.env` jangan pernah di-commit.** Isinya password dan kunci rahasia. Yang di-commit
-   cuma `.env.example` (isinya nama variabelnya doang, tanpa nilainya).
+5. **File `.env.local` jangan pernah di-commit.** Isinya password dan kunci rahasia. Yang
+   di-commit cuma `.env.example` (isinya nama variabelnya doang, tanpa nilainya).
 6. **Gambar jangan masuk git.** Folder `public/` sudah 18 MB. Semua upload baru ke Vercel Blob.
 7. **Tiap orang punya partner cadangan** (lihat tabel bagian 3), biar nggak macet kalau ada yang
    berhalangan.
