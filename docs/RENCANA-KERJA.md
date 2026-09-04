@@ -3,8 +3,12 @@
 Panduan pembagian tugas **5 orang** untuk membuat backend NewsTimes, sampai websitenya online
 **tanpa bayar sepeser pun**.
 
-Dokumen ini dibuat supaya 5 orang bisa kerja bareng tanpa saling tabrakan dan tanpa saling
+Dokumen ini dibuat supaya semua orang bisa kerja bareng tanpa saling tabrakan dan tanpa saling
 menunggu.
+
+> **Catatan:** rencana ini disusun untuk 5 peran, tapi anggota di organisasi GitHub ternyata
+> ada **4 orang**. Jadi pembagiannya perlu disesuaikan — entah dua peran digabung, atau ada
+> anggota yang belum diundang. Bahas ini dulu sebelum mulai.
 
 ## Kondisi repo sekarang
 
@@ -34,9 +38,10 @@ Kalau ada istilah yang belum familiar, balik ke sini.
 | **Seed** | Mengisi database dengan data awal, biar nggak kosong pas dites. |
 | **ORM (Prisma)** | Alat supaya kita bisa ambil data pakai kode JavaScript biasa, nggak perlu nulis SQL manual. |
 | **Repository** | Fungsi pembungkus buat ambil data, misalnya `articleRepo.findBySlug()`. Halaman cukup panggil ini, nggak perlu tahu caranya ngambil dari mana. |
-| **Mock / data palsu** | Data bohongan sementara, dipakai buat ngetes sambil nunggu yang asli jadi. |
-| **API** | "Pintu" buat ngambil atau ngirim data. Contoh: `/api/articles` buat ambil daftar artikel. |
-| **Route Handler** | Cara bikin API di Next.js. Filenya `route.ts` di dalam folder `src/app/api/`. |
+| **Data contoh (mock)** | Data sementara yang nempel di kode, dipakai buat ngoding sambil nunggu database jadi. |
+| **API** | "Pintu" berupa alamat URL buat ngambil atau ngirim data, misal `/api/newsletter`. Dipakai kalau yang manggil ada DI LUAR server kita (browser pengunjung, robot Google). Kalau pemanggilnya sesama kode server, cukup panggil fungsi langsung. |
+| **Route Handler** | Cara bikin alamat API di Next.js. Filenya `route.ts` di dalam folder `src/app/api/`. |
+| **Server Action** | Cara ngirim data dari form ke server TANPA bikin alamat API sendiri. Next.js yang bikinin diam-diam. |
 | **Zod** | Library buat ngecek data kiriman user bener atau nggak (misal: email formatnya valid). |
 | **Auth** | Singkatan authentication — sistem login. |
 | **Middleware** | Kode yang jalan duluan sebelum halaman dibuka. Dipakai buat nolak orang yang belum login. |
@@ -71,6 +76,39 @@ Tapi ada satu aturan yang wajib dipegang: **kode halaman jangan pernah ngobrol l
 database.** Semua lewat folder `src/server/`. Jadi kalau nanti mau dipisah, tinggal angkat
 folder itu, nggak perlu bongkar semuanya.
 
+#### Jangan salah paham: monolith BUKAN berarti nggak ada API
+
+Kata "API" dipakai untuk dua hal yang berbeda, dan gampang ketuker:
+
+| | Maksudnya | Kita pakai? |
+|---|---|---|
+| API sebagai **proyek terpisah** | Backend jadi repo sendiri, deploy sendiri, alamat sendiri | **Tidak** — ini yang dihindari monolith |
+| API sebagai **alamat URL** | `/api/newsletter` di dalam proyek yang sama | **Ya**, seperlunya |
+
+Kenapa masih perlu alamat URL? Karena ada satu batas yang nggak bisa dilompati: **kode yang
+jalan di browser pengunjung nggak bisa manggil fungsi yang ada di server.**
+
+Waktu pengunjung ngetik email di form lalu klik kirim, itu terjadi di HP dia. HP itu nggak
+punya akses ke `newsletterRepo` — fungsi itu ada di server kita. Jadi harus ada alamat buat
+ngirim datanya. Sama juga `rss.xml` dan `sitemap.xml`: yang baca itu robot Google dan aplikasi
+pembaca berita di luar sana, mereka cuma bisa buka URL.
+
+Jadi monolith itu menghapus lompatan yang **nggak perlu** (server ke server sendiri), bukan
+lompatan yang **memang perlu** (browser ke server).
+
+**Tapi porsinya lebih kecil dari yang ditulis di rencana awal.** Next.js punya fitur *Server
+Action* yang bikin form bisa ngirim data ke server tanpa kita nulis alamat API sama sekali.
+Yang beneran wajib ditulis tangan cuma yang dibaca mesin dari luar:
+
+| Kebutuhan | Wajib alamat URL? | Kenapa |
+|---|---|---|
+| `sitemap.xml` | **Ya** | Dibaca robot Google |
+| `rss.xml` | **Ya** | Dibaca aplikasi pembaca berita |
+| `robots.txt` | **Ya** | Dibaca robot |
+| Form newsletter | Tidak | Bisa pakai Server Action |
+| Tombol "Muat Lebih Banyak" | Tidak | Bisa pakai Server Action |
+| Halaman admin | Tidak | Panggil fungsi langsung |
+
 ### Keputusan 2: Deploy di hari pertama, bukan minggu terakhir
 
 Repo ini sudah bisa di-deploy sekarang juga karena datanya masih hardcode. Jadi naikin ke Vercel
@@ -84,7 +122,7 @@ teman satu tim bisa lihat hasilnya tanpa install apa-apa.
 
 Hari pertama, tentukan dulu: tabelnya apa aja, kolomnya apa aja, nama fungsinya apa.
 
-Habis itu, ubah array di `src/data/articles.ts` jadi **data palsu (mock)**. Dengan begitu 4 orang
+Habis itu, ubah array di `src/data/articles.ts` jadi **data contoh (mock)**. Dengan begitu 4 orang
 lain bisa langsung nulis kode minggu pertama, walaupun databasenya belum jadi. Nanti tinggal
 diganti yang asli.
 
@@ -99,7 +137,7 @@ src/
 ├── app/
 │   ├── (public)/          # halaman untuk pengunjung          → Orang 2
 │   ├── admin/             # halaman admin: login, tulis artikel → Orang 3
-│   └── api/               # API                                → Orang 4
+│   └── api/               # alamat URL, seperlunya saja       → Orang 4
 │
 ├── server/                # ← BATAS. Semua kode backend di sini.
 │   ├── db/                # koneksi database + schema Prisma   → Orang 1
@@ -123,7 +161,7 @@ Satu orang pegang satu bagian beserta foldernya. Boleh kok ngedit folder orang l
 | **Orang 1** | Database | `prisma/`, `src/server/db/`, `src/server/repositories/` | Orang 4 |
 | **Orang 2** | Tampilan Publik | `src/app/(public)/`, `src/components/` | Orang 3 |
 | **Orang 3** | Halaman Admin & Login | `src/app/admin/`, `src/server/auth/` | Orang 2 |
-| **Orang 4** | API & SEO | `src/app/api/`, `src/lib/validation/`, `src/server/services/` | Orang 1 |
+| **Orang 4** | Validasi & SEO | `src/lib/validation/`, `src/server/services/`, `src/app/api/` | Orang 1 |
 | **Orang 5** | Deploy & Testing | `.github/workflows/`, `.env.example`, `tests/`, `README.md` | Orang 1 |
 
 > **Kenapa ada partner cadangan?** Biar kalau satu orang sakit atau sibuk, ada satu orang lagi
@@ -203,17 +241,27 @@ menerbitkannya, lalu artikel itu langsung muncul di halaman depan — tanpa perl
 
 ---
 
-### Orang 4 — API & SEO
+### Orang 4 — Validasi & SEO
 
-**Perannya:** bikin "pintu" data, dan memastikan artikel gampang ketemu di Google.
+> **Catatan revisi:** peran ini awalnya ditulis "API & SEO". Namanya diganti karena
+> menyesatkan. Di monolith, sebagian besar hal yang dulu butuh API sekarang bisa pakai
+> Server Action tanpa nulis alamat URL sama sekali. Yang tersisa dan beneran wajib itu
+> pengecekan data, aturan bisnis, dan SEO. Penjelasan lengkapnya ada di Keputusan 1.
+
+**Perannya:** jadi penjaga gerbang data yang masuk, dan memastikan artikel gampang ketemu
+di Google.
 
 Tugas:
 
-- Bikin aturan Zod buat ngecek data masuk (dipakai bareng frontend dan backend)
-- Bikin API buat: daftar artikel, detail artikel, per kategori, pencarian, dan halaman berikutnya
-- `POST /api/newsletter`: cek format email, tolak yang sudah pernah daftar, batasi biar nggak
-  di-spam. Sekarang tombolnya cuma munculin `alert()`, datanya nggak disimpan ke mana-mana
-- Bikin `sitemap.xml`, `rss.xml`, `robots.txt` — website berita hampir selalu diminta punya ini
+- Bikin aturan Zod buat ngecek semua data yang masuk dari luar — ini yang paling penting,
+  dipakai semua orang
+- Aturan bisnis di `src/server/services/`: bikin alamat artikel dari judul, aturan boleh
+  terbit atau nggak
+- Newsletter: cek format email, tolak yang sudah pernah daftar, batasi biar nggak di-spam.
+  Sekarang tombolnya cuma munculin `alert()`, datanya nggak disimpan ke mana-mana.
+  *Boleh pakai Server Action, nggak wajib bikin `/api/newsletter`.*
+- Bikin `sitemap.xml`, `rss.xml`, `robots.txt` — ini yang **wajib** berupa alamat URL,
+  karena yang baca robot Google dan aplikasi pembaca berita di luar sana
 - Atur preview link kalau artikel dibagikan ke WhatsApp / Facebook (metadata OG)
 
 **Dianggap selesai kalau:** semua data dari luar dicek dulu pakai Zod, dan begitu satu artikel
@@ -250,15 +298,15 @@ Semua orang kumpul. Hari ini belum nulis fitur, yang dikerjain cuma nentuin kese
 
 | Siapa | Kerja |
 |---|---|
-| Semua | Gambar rancangan tabel database bareng-bareng, sepakati nama tipe data dan daftar API |
+| Semua | Gambar rancangan tabel database bareng-bareng, sepakati nama tipe data dan daftar alamat URL yang perlu |
 | Semua | Tulis struktur folder dan siapa pegang apa di file `CLAUDE.md` |
 | Orang 5 | Naikin repo apa adanya ke Vercel → hari pertama sudah punya link online |
 | Orang 5 | Nyalakan proteksi branch `main`: wajib PR, wajib 1 approval, wajib CI hijau |
-| Orang 1 | Ubah `src/data/articles.ts` jadi data palsu, terus **jangan diutak-atik lagi** |
+| Orang 1 | Ubah `src/data/articles.ts` jadi data contoh, terus **jangan diutak-atik lagi** |
 
 ### Sprint 1 — Kerja paralel (minggu 1)
 
-4 orang nulis kode pakai data palsu, sementara Orang 1 bikin database aslinya. Nggak ada yang
+4 orang nulis kode pakai data contoh, sementara Orang 1 bikin database aslinya. Nggak ada yang
 nunggu.
 
 | Siapa | Kerja |
@@ -266,7 +314,7 @@ nunggu.
 | Orang 1 | Daftar Neon, pasang Prisma, jalankan migration dan seed pertama |
 | Orang 2 | Pindahkan halaman dari `import articles` ke pemanggilan fungsi repository |
 | Orang 3 | Bikin kerangka `/admin`, pasang Auth.js, bikin middleware |
-| Orang 4 | Bikin aturan Zod dan API pertama, dites pakai data palsu |
+| Orang 4 | Bikin aturan Zod dan aturan bisnis pertama, dites pakai data contoh |
 | Orang 5 | Setting CI, `.env.example`, preview per PR, kerangka Vitest |
 
 ### Sprint 2 — Gabungkan (minggu 2)
@@ -275,7 +323,7 @@ Data palsu diganti database asli. Kalau kesepakatan di Sprint 0 benar, ini cuma 
 
 | Siapa | Kerja |
 |---|---|
-| Orang 1 | Ganti data palsu jadi Prisma asli, tambah index di `slug`, `categoryId`, `publishedAt` biar query cepat |
+| Orang 1 | Ganti data contoh jadi Prisma asli, tambah index di `slug`, `categoryId`, `publishedAt` biar query cepat |
 | Orang 2 | Halaman kategori, pencarian, dan tombol "Muat Lebih Banyak" yang beneran jalan |
 | Orang 3 | Fitur tambah/edit/hapus artikel lengkap, plus upload gambar |
 | Orang 4 | Newsletter, sitemap, RSS, metadata OG |
@@ -375,7 +423,7 @@ Sprint 0 (file itu yang paling rawan diedit banyak orang sekaligus).
 ### Sedang — Orang 1 bisa bikin yang lain nunggu
 
 Kalau database belum jadi, 4 orang nganggur.
-**Solusinya:** data palsu di Sprint 0. Ini alasan utama kenapa langkah itu penting.
+**Solusinya:** data contoh di Sprint 0. Ini alasan utama kenapa langkah itu penting.
 
 ### Sedang — Database "tidur" pas lagi demo
 
