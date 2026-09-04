@@ -11,8 +11,9 @@
  *
  * Jalankan: npm run verify:all
  */
-import { loadEnvFiles } from "../prisma/load-env";
-loadEnvFiles();
+// Wajib paling atas: memuat .env sebelum modul lain dimuat.
+// Lihat penjelasannya di prisma/load-env-auto.ts
+import "../prisma/load-env-auto";
 
 import type { ArticleAdminRepository } from "@/server/repositories/article-admin-repository";
 import type { NewsletterRepository } from "@/server/repositories/newsletter-repository";

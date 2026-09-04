@@ -17,7 +17,8 @@
     "db:reset": "prisma migrate reset && prisma db seed",
     "verify:repo": "tsx scripts/verify-article-repository.ts",
     "verify:compare": "tsx --conditions=react-server scripts/compare-repositories.ts",
-    "verify:all": "tsx --conditions=react-server scripts/verify-all-repositories.ts"
+    "verify:all": "tsx --conditions=react-server scripts/verify-all-repositories.ts",
+    "coba": "tsx --conditions=react-server scripts/coba-sendiri.ts"
   },
   "dependencies": {
     "@neon/config": "^1.2.0",

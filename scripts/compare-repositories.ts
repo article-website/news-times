@@ -7,8 +7,9 @@
  *
  * Jalankan: npx tsx --conditions=react-server scripts/... (lihat npm script)
  */
-import { loadEnvFiles } from "../prisma/load-env";
-loadEnvFiles();
+// Wajib paling atas: memuat .env sebelum modul lain dimuat.
+// Lihat penjelasannya di prisma/load-env-auto.ts
+import "../prisma/load-env-auto";
 
 import { inMemoryArticleRepository as mem } from "@/server/repositories/in-memory-article-repository";
 import { prismaArticleRepository as db } from "@/server/repositories/prisma-article-repository";
