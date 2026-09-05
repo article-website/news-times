@@ -2,6 +2,7 @@ import HeroFeatured from "@/components/HeroFeatured";
 import ArticleCard from "@/components/ArticleCard";
 import Sidebar from "@/components/Sidebar";
 import { articles } from "@/data/articles";
+import Link from "next/link";
 
 export default function HomePage() {
   const featured = articles.slice(0, 3);
@@ -15,12 +16,14 @@ export default function HomePage() {
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Berita Terbaru</h2>
-            <a
+            <Link
               href="/articles"
-              className="text-blue-600 text-sm font-medium hover:underline"
+              className="text-blue-600 text-sm font-medium
+              hover:underline"
             >
+              {" "}
               Lihat Semua
-            </a>
+            </Link>
           </div>
 
           <div className="flex flex-col gap-6">

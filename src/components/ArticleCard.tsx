@@ -11,7 +11,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
       <img
         src={article.image}
         alt={article.title}
-        className="w-40 h-28 object-cover rounded-lg flex-shrink-0"
+        className="w-40 h-28 object-cover rounded-lg shrink-0"
       />
       <div>
         <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">

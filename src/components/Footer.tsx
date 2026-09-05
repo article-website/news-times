@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <p className="text-white text-lg font-bold mb-3">
-            News<span className="text-blue-500">Hub</span>
+            News<span className="text-blue-500">Times</span>
           </p>
           <p className="text-sm text-gray-400">
             Sumber informasi terpercaya untuk berita terbaru dari dalam dan luar

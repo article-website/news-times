@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Article } from "@/data/articles";
+import { Article } from "../data/articles";
 
 interface PopularArticlesProps {
   articles: Article[];
@@ -22,7 +22,7 @@ export default function PopularArticles({ articles }: PopularArticlesProps) {
             <img
               src={article.image}
               alt={article.title}
-              className="w-14 h-14 object-cover rounded-md flex-shrink-0"
+              className="w-14 h-14 object-cover rounded-md shrink-0"
             />
             <div>
               <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
