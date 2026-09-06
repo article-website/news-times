@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-gray-300 mt-16">
@@ -33,6 +35,11 @@ export default function Footer() {
             <li>
               <a href="#" className="hover:text-white">
                 Kontak
+              </a>
+            </li>
+            <li>
+              <a href="/admin" className="hover:text-white text-gray-400">
+                Redaksi (Admin)
               </a>
             </li>
           </ul>
