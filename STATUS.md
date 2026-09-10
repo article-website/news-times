@@ -1,6 +1,10 @@
 # STATUS — NewsTimes
 
-> **Diperbarui:** 10 September 2026 · **Kondisi:** `main` di commit `f9f4ece`
+> **Diperbarui:** 10 September 2026 · **Kondisi:** `main` di commit `66c8773`
+>
+> Kondisi kode sendiri belum berubah sejak `f9f4ece` — tiga commit setelahnya isinya dokumentasi
+> dan konfigurasi agent, bukan kode aplikasi. Karena itu seluruh hasil pengujian di bawah masih
+> berlaku.
 >
 > Berkas ini ditujukan untuk **manusia maupun AI agent** yang baru membuka repo ini. Bacalah ini
 > lebih dulu sebelum mengubah apa pun. Cara memperbaruinya ada di bagian paling bawah.
@@ -32,6 +36,7 @@ yang memakainya.** Seluruh halaman masih membaca 5 artikel yang ditulis tangan d
 | Login & penguncian `/admin` | **Belum** | Tabel `User` siap, sistemnya belum dibuat. Tautan `/admin` sudah publik di footer |
 | Validasi & SEO | **Belum** | Belum ada Zod, sitemap, rss, robots, maupun metadata OG |
 | Deploy & pengecekan otomatis | **Belum** | Tidak ada `.github/workflows/`, tidak ada `tests/`, `main` belum dikunci |
+| Dokumentasi | **Selesai** | README, PRD, rencana kerja, panduan database, laporan database, dan berkas ini |
 
 Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang belum tuntas**.
 
@@ -167,6 +172,7 @@ lama — verifikasi ulang dengan menjalankan perintah di tabel atas, lalu perbar
 
 | Berkas | Isinya |
 |---|---|
+| `README.md` | Pintu depan repo: cara menjalankan, daftar perintah, struktur folder, aturan kerja |
 | `docs/PRD.md` | Apa yang dibangun dan kenapa: pengguna, lingkup, daftar kebutuhan ber-ID beserta statusnya |
 | `docs/RENCANA-KERJA.md` | Siapa mengerjakan apa dan kapan: pembagian peran, jadwal 4 sprint, aturan tim |
 | `docs/DATABASE.md` | Cara memakai fungsi akses data, lengkap dengan contoh kode per peran |
