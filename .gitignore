@@ -47,3 +47,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .neon
+
+# skill Neon - terpasang otomatis dari MCP server di laptop masing-masing,
+# bukan bagian dari ECC dan bukan bagian dari proyek ini
+/.claude/skills/neon
+/.claude/skills/neon-*
+/skills-lock.json
