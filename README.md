@@ -103,6 +103,7 @@ docs/                     dokumentasi tim
 | [docs/RENCANA-KERJA.md](./docs/RENCANA-KERJA.md) | Siapa mengerjakan apa dan kapan: pembagian peran, jadwal, aturan tim |
 | [docs/DATABASE.md](./docs/DATABASE.md) | Cara mengambil dan menyimpan data, lengkap dengan contoh kode per peran |
 | [docs/LAPORAN-DATABASE.md](./docs/LAPORAN-DATABASE.md) | Laporan bagian database: tiap keputusan beserta alasannya dan bukti pengujiannya |
+| [docs/presentasi/](./docs/presentasi/) | Slide laporan progres, 14 slide siap presentasi, plus skrip pembuatnya |
 
 ---
 

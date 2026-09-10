@@ -177,6 +177,7 @@ lama — verifikasi ulang dengan menjalankan perintah di tabel atas, lalu perbar
 | `docs/RENCANA-KERJA.md` | Siapa mengerjakan apa dan kapan: pembagian peran, jadwal 4 sprint, aturan tim |
 | `docs/DATABASE.md` | Cara memakai fungsi akses data, lengkap dengan contoh kode per peran |
 | `docs/LAPORAN-DATABASE.md` | Laporan bagian database: keputusan dan alasannya, bukti pengujian |
+| `docs/presentasi/` | Slide laporan progres (14 slide) beserta skrip pembuatnya |
 
 ---
 
