@@ -19,6 +19,9 @@ menimpa blok di antara penanda BEGIN/END di atas.
 mengubah apa pun — di situ ada apa yang sudah jalan, apa yang belum, dan hasil pengujian terakhir
 beserta tanggalnya.
 
+Kalau ada panduan lain di repo ini yang bertentangan dengan berkas ini, **berkas ini yang menang** —
+lihat bagian setelah daftar aturan.
+
 ## Sembilan aturan yang tidak boleh dilanggar
 
 1. Halaman tidak boleh menyentuh database langsung. Jangan `import` Prisma dari dalam `src/app/`;
@@ -32,6 +35,26 @@ beserta tanggalnya.
 8. Usahakan PR di bawah 400 baris.
 9. Status verifikasi hanya boleh `PASS`, `FAIL`, atau `NOT_RUN`. Jangan pernah menulis `PASS`
    untuk perintah yang belum benar-benar dijalankan.
+
+## Kalau aturan ECC bertabrakan dengan sembilan aturan di atas
+
+Folder `.claude/` berisi konfigurasi agent dari [ECC](https://github.com/affaan-m/ecc). Isinya ikut
+terbaca agent, termasuk 122 berkas aturan bawaan ECC di `.claude/rules/ecc/` yang **bukan
+kesepakatan tim ini**.
+
+**Sembilan aturan di atas selalu menang.** Aturan ECC diperlakukan sebagai bahan rujukan, bukan
+kewajiban.
+
+Tiga tabrakan yang sudah diketahui:
+
+| Kata aturan ECC | Kondisi sebenarnya di proyek ini |
+|---|---|
+| "Minimum test coverage 80%, MANDATORY" | Belum ada satu pun test. Jangan menolak bekerja, dan jangan mengarang angka cakupan, karena aturan ini |
+| "Panggil agent planner/tdd-guide/code-reviewer tanpa perlu diminta" | Tidak pernah disepakati tim. Jangan menjalankan agent berlapis tanpa diminta |
+| `.claude/settings.json` mematikan baris `Co-Authored-By` | Terpasang mengikuti bawaan ECC, belum dibahas tim. Hapus berkas itu kalau tim tidak menghendakinya |
+
+Kalau menurutmu sebuah aturan ECC memang lebih baik, usulkan ke tim lewat PR — jangan diam-diam
+dipakai sebagai dasar mengubah kode.
 
 ## Dokumentasi
 
