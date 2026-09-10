@@ -173,6 +173,7 @@ lama — verifikasi ulang dengan menjalankan perintah di tabel atas, lalu perbar
 | Berkas | Isinya |
 |---|---|
 | `README.md` | Pintu depan repo: cara menjalankan, daftar perintah, struktur folder, aturan kerja |
+| `docs/PENJELASAN-UNTUK-PEMULA.md` | Penjelasan proyek dari nol untuk yang baru mulai: cara kerja web, teknologi, konsep, alur git |
 | `docs/PRD.md` | Apa yang dibangun dan kenapa: pengguna, lingkup, daftar kebutuhan ber-ID beserta statusnya |
 | `docs/RENCANA-KERJA.md` | Siapa mengerjakan apa dan kapan: pembagian peran, jadwal 4 sprint, aturan tim |
 | `docs/DATABASE.md` | Cara memakai fungsi akses data, lengkap dengan contoh kode per peran |

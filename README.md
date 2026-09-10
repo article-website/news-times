@@ -99,6 +99,7 @@ docs/                     dokumentasi tim
 | Berkas | Isinya |
 |---|---|
 | [STATUS.md](./STATUS.md) | Progres terkini, hasil pengujian terakhir, keputusan yang masih menggantung |
+| [docs/PENJELASAN-UNTUK-PEMULA.md](./docs/PENJELASAN-UNTUK-PEMULA.md) | **Mulai dari sini kalau kamu baru.** Penjelasan proyek dari nol, tanpa istilah yang tidak dijelaskan |
 | [docs/PRD.md](./docs/PRD.md) | Apa yang dibangun dan kenapa: pengguna, lingkup, daftar kebutuhan beserta statusnya |
 | [docs/RENCANA-KERJA.md](./docs/RENCANA-KERJA.md) | Siapa mengerjakan apa dan kapan: pembagian peran, jadwal, aturan tim |
 | [docs/DATABASE.md](./docs/DATABASE.md) | Cara mengambil dan menyimpan data, lengkap dengan contoh kode per peran |

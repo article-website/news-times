@@ -64,6 +64,7 @@ dipakai sebagai dasar mengubah kode.
 | [docs/PRD.md](./docs/PRD.md) | Apa yang dibangun dan kenapa |
 | [docs/RENCANA-KERJA.md](./docs/RENCANA-KERJA.md) | Siapa mengerjakan apa dan kapan |
 | [docs/DATABASE.md](./docs/DATABASE.md) | Cara mengambil dan menyimpan data |
+| [docs/PENJELASAN-UNTUK-PEMULA.md](./docs/PENJELASAN-UNTUK-PEMULA.md) | Penjelasan proyek dari nol — pakai ini kalau perlu menjelaskan sesuatu ke anggota tim yang masih pemula |
 | [docs/LAPORAN-DATABASE.md](./docs/LAPORAN-DATABASE.md) | Laporan bagian database beserta alasan tiap keputusan |
 
 Setelah menyelesaikan pekerjaan, perbarui `STATUS.md` — caranya ada di bagian bawah berkas itu.
