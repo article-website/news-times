@@ -104,6 +104,11 @@ docs/                     dokumentasi tim
 | [docs/RENCANA-KERJA.md](./docs/RENCANA-KERJA.md) | Siapa mengerjakan apa dan kapan: pembagian peran, jadwal, aturan tim |
 | [docs/DATABASE.md](./docs/DATABASE.md) | Cara mengambil dan menyimpan data, lengkap dengan contoh kode per peran |
 | [docs/LAPORAN-DATABASE.md](./docs/LAPORAN-DATABASE.md) | Laporan bagian database: tiap keputusan beserta alasannya dan bukti pengujiannya |
+| [docs/ARSITEKTUR.md](./docs/ARSITEKTUR.md) | Lapisan sistem, arah ketergantungan, keputusan arsitektur, dan di mana kode baru diletakkan |
+| [docs/KEAMANAN.md](./docs/KEAMANAN.md) | Hasil audit keamanan: temuan beserta buktinya, syarat wajib sebelum deploy |
+| [docs/PENGUJIAN.md](./docs/PENGUJIAN.md) | Apa yang sudah diuji, celah terbesar, dan yang harus diuji lebih dulu |
+| [docs/DEPLOY.md](./docs/DEPLOY.md) | Rencana dan daftar periksa menaikkan situs ke internet |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Alur kerja dari membuat branch sampai PR digabung |
 | [docs/presentasi/](./docs/presentasi/) | Slide laporan progres, 14 slide siap presentasi, plus skrip pembuatnya |
 
 ---

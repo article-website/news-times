@@ -1,10 +1,10 @@
 # STATUS — NewsTimes
 
-> **Diperbarui:** 10 September 2026 · **Kondisi:** `main` di commit `66c8773`
+> **Diperbarui:** 11 September 2026 · **Kode aplikasi terakhir berubah di commit `f9f4ece`**
 >
-> Kondisi kode sendiri belum berubah sejak `f9f4ece` — tiga commit setelahnya isinya dokumentasi
-> dan konfigurasi agent, bukan kode aplikasi. Karena itu seluruh hasil pengujian di bawah masih
-> berlaku.
+> Semua commit setelah `f9f4ece` isinya dokumentasi dan konfigurasi agent, bukan kode aplikasi.
+> Karena itu seluruh hasil pengujian di bawah masih berlaku. Kalau ada commit yang mengubah isi
+> `src/`, `prisma/`, atau `package.json`, jalankan ulang pengujiannya dan perbarui tanggal di atas.
 >
 > Berkas ini ditujukan untuk **manusia maupun AI agent** yang baru membuka repo ini. Bacalah ini
 > lebih dulu sebelum mengubah apa pun. Cara memperbaruinya ada di bagian paling bawah.
@@ -63,6 +63,7 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
 | Admin tidak menyimpan ke database | `src/app/admin/page.tsx` bertanda `"use client"` dan memakai `localStorage` |
 | Tampilan loading & error | Belum ada `loading.tsx` maupun `error.tsx` di mana pun |
 | Pengecekan otomatis | Tidak ada `.github/workflows/`; `npm run lint` masih 2 error sehingga CI akan langsung merah |
+| Aturan "draft tidak bocor" belum diuji | Ditegakkan di `src/server/repositories/prisma-article-repository.ts:59-60`, tapi tidak ada skrip yang memeriksa sisi publik. Kalau baris itu rusak, 151 pengecekan tetap lulus — `docs/KEAMANAN.md` temuan K-9 |
 
 ---
 
@@ -179,6 +180,11 @@ lama — verifikasi ulang dengan menjalankan perintah di tabel atas, lalu perbar
 | `docs/DATABASE.md` | Cara memakai fungsi akses data, lengkap dengan contoh kode per peran |
 | `docs/LAPORAN-DATABASE.md` | Laporan bagian database: keputusan dan alasannya, bukti pengujian |
 | `docs/presentasi/` | Slide laporan progres (14 slide) beserta skrip pembuatnya |
+| `docs/ARSITEKTUR.md` | Lapisan sistem, keputusan arsitektur A-01 s.d. A-11, di mana kode baru diletakkan |
+| `docs/KEAMANAN.md` | Audit keamanan: temuan K-1 s.d. K-9 beserta buktinya, syarat wajib sebelum deploy |
+| `docs/PENGUJIAN.md` | Pengujian yang ada, celah terbesar, prioritas pengujian |
+| `docs/DEPLOY.md` | Rencana deploy, variabel produksi, perintah yang boleh dan tidak boleh ke database produksi |
+| `CONTRIBUTING.md` | Alur kerja dari branch sampai PR digabung |
 
 ---
 

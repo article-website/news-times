@@ -66,5 +66,10 @@ dipakai sebagai dasar mengubah kode.
 | [docs/DATABASE.md](./docs/DATABASE.md) | Cara mengambil dan menyimpan data |
 | [docs/PENJELASAN-UNTUK-PEMULA.md](./docs/PENJELASAN-UNTUK-PEMULA.md) | Penjelasan proyek dari nol — pakai ini kalau perlu menjelaskan sesuatu ke anggota tim yang masih pemula |
 | [docs/LAPORAN-DATABASE.md](./docs/LAPORAN-DATABASE.md) | Laporan bagian database beserta alasan tiap keputusan |
+| [docs/ARSITEKTUR.md](./docs/ARSITEKTUR.md) | Lapisan, arah ketergantungan, dan **bagian 9: di mana kode baru diletakkan** |
+| [docs/KEAMANAN.md](./docs/KEAMANAN.md) | Temuan keamanan K-1 s.d. K-9 — baca sebelum menyentuh login, input, atau data akun |
+| [docs/PENGUJIAN.md](./docs/PENGUJIAN.md) | Pengecekan mana yang wajib dijalankan sebelum menyatakan selesai |
+| [docs/DEPLOY.md](./docs/DEPLOY.md) | Perintah yang **tidak boleh** dijalankan ke database produksi |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Alur branch, commit, dan PR |
 
 Setelah menyelesaikan pekerjaan, perbarui `STATUS.md` — caranya ada di bagian bawah berkas itu.
