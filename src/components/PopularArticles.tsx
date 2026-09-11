@@ -1,8 +1,16 @@
+import { articleRepo } from "@/server/repositories";
+import Image from "next/image";
 import Link from "next/link";
-import { Article } from "../data/articles";
+
+interface articleRepo {
+  slug: string;
+  title: string;
+  imageUrl: string | null;
+  publishedAt: Date | null;
+}
 
 interface PopularArticlesProps {
-  articles: Article[];
+  articles: articleRepo[];
 }
 
 export default function PopularArticles({ articles }: PopularArticlesProps) {
@@ -19,16 +27,24 @@ export default function PopularArticles({ articles }: PopularArticlesProps) {
             <span className="text-blue-600 font-bold text-sm w-5 pt-1">
               {String(index + 1).padStart(2, "0")}
             </span>
-            <img
-              src={article.image}
-              alt={article.title}
-              className="w-14 h-14 object-cover rounded-md shrink-0"
-            />
+            {article.imageUrl ? (
+              <Image
+                src={article.imageUrl}
+                alt={article.title}
+                width={160}
+                height={112}
+                className="w-40 h-28 object-cover rounded-lg shrink-0"
+              />
+            ) : (
+              <div className="w-40 h-28 rounded-lg shrink-0 bg-gray-200" />
+            )}
             <div>
               <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                 {article.title}
               </p>
-              <p className="text-xs text-gray-400 mt-1">{article.date}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {article.publishedAt?.toLocaleDateString("id-ID")}
+              </p>
             </div>
           </Link>
         ))}

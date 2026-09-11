@@ -1,12 +1,17 @@
 import HeroFeatured from "@/components/HeroFeatured";
-import ArticleCard from "@/components/ArticleCard";
+import { articleRepo } from "@/server/repositories";
+import ArticleFeed from "@/components/ArticleFeed";
 import Sidebar from "@/components/Sidebar";
-import { articles } from "@/data/articles";
 import Link from "next/link";
 
-export default function HomePage() {
-  const featured = articles.slice(0, 3);
-  const popular = articles.slice(0, 5);
+
+export default async function HomePage() {
+  const featured = await articleRepo.listFeatured(3);
+  const { items, hasMore } = await articleRepo.listPublished({
+    page: 1,
+    perPage: 3,
+  });
+  const popular = await articleRepo.listPopular(5);
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-10">
@@ -26,15 +31,10 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="flex flex-col gap-6">
-            {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
-            ))}
-          </div>
-
-          <button className="mt-8 w-full border border-gray-300 rounded-lg py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            Muat Lebih Banyak
-          </button>
+          <ArticleFeed
+            initialArticles={items}
+            initialHasMore={hasMore}
+          />
         </div>
 
         <Sidebar popularArticles={popular} />

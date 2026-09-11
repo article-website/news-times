@@ -2,10 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Article } from "@/data/articles";
+import Image from "next/image";
+import { articleRepo } from "@/server/repositories";
+
+interface authorRef {
+  name: string;
+}
+
+interface articleRepo {
+  slug: string;
+  title: string;
+  excerpt: string;
+  imageUrl: string | null;
+  publishedAt: Date | null;
+  author: authorRef;
+}
 
 interface HeroFeaturedProps {
-  articles: Article[];
+  articles: articleRepo[];
 }
 
 export default function HeroFeatured({ articles }: HeroFeaturedProps) {
@@ -23,24 +37,32 @@ export default function HeroFeatured({ articles }: HeroFeaturedProps) {
         href={`/articles/${article.slug}`}
         className="absolute inset-0 block group"
       >
-        <img
-          src={article.image}
-          alt={article.title}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        {article.imageUrl ? (
+          <Image
+            src={article.imageUrl}
+            alt={article.title}
+            width={1200}
+            height={675}
+            className="w-full h-full object-cover rounded-lg shrink-0"
+          />
+        ) : (
+          <div className="w-full h-full rounded-lg shrink-0 bg-gray-200" />
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 p-8 text-white max-w-2xl">
           <span className="inline-block bg-blue-600 text-xs font-semibold px-3 py-1 rounded mb-3">
             FEATURED
           </span>
-          <p className="text-sm text-gray-200 mb-2">{article.date}</p>
+          <p className="text-sm text-gray-200 mb-2">
+            {article.publishedAt?.toLocaleDateString("id-ID")}
+          </p>
           <h2 className="text-3xl font-bold mb-3 leading-tight">
             {article.title}
           </h2>
           <p className="text-gray-200 text-sm mb-4 line-clamp-2">
             {article.excerpt}
           </p>
-          <p className="text-sm font-medium">{article.author}</p>
+          <p className="text-sm font-medium">{article.author.name}</p>
         </div>
       </Link>
 
