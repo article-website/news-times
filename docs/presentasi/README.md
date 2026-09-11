@@ -20,7 +20,7 @@ Google Slides, atau Keynote.
 | 6 | Model data | Lima tabel |
 | 7 | Keputusan: dua versi | Supaya tim tidak saling menunggu |
 | 8 | Keputusan: draft tidak bocor | Dua syarat sebelum artikel terlihat publik |
-| 9 | Bukti | 151 pengecekan otomatis, termasuk yang masih `NOT_RUN` |
+| 9 | Bukti | 163 pengecekan otomatis, termasuk yang masih `NOT_RUN` |
 | 10 | Kondisi sekarang | Status per bagian, apa adanya |
 | 11 | Risiko | Empat hal yang perlu diputuskan tim |
 | 12 | Langkah berikutnya | Tujuh langkah, sudah diurutkan |

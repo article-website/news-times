@@ -63,7 +63,7 @@ Kode halaman tidak perlu diubah sama sekali saat berpindah. Penjelasannya ada di
 | `npm run db:studio` | Membuka Prisma Studio untuk melihat isi database |
 | `npm run verify:repo` | 37 pengecekan fungsi akses data — **tidak butuh database** |
 | `npm run verify:compare` | Membandingkan hasil data contoh vs database, kolom per kolom |
-| `npm run verify:all` | 94 pengecekan admin, login, dan newsletter — butuh database |
+| `npm run verify:all` | 106 pengecekan admin, login, newsletter, dan aturan tampil publik — butuh database |
 | `npm run coba` | Mencoba fungsi akses data langsung, tanpa membuka tampilan |
 
 Hasil terakhir semua perintah ini, lengkap dengan tanggalnya, ada di [STATUS.md](./STATUS.md).

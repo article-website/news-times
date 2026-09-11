@@ -50,7 +50,7 @@ Urutan yang aman: **login dulu, baru sambungkan ke database.** Tidak boleh terba
 | **K-2** | Sedang | Belum ada sistem login sama sekali | Tabel `User` ada, tapi tidak ada kode autentikasi di `src/` | Orang 3 |
 | **K-3** | Sedang | Belum ada validasi input di batas sistem | Tidak ada Zod maupun `src/lib/validation/`. Halaman admin menerima isian form apa adanya | Orang 4 |
 | **K-4** | Sedang | Newsletter tanpa pembatas spam | Belum ada pembatasan permintaan. Saat ini belum berdampak karena formnya belum menyimpan apa pun | Orang 4 |
-| **K-9** | Sedang | Aturan "draft tidak bocor" **tidak punya pengujian** | Ditegakkan di `prisma-article-repository.ts:59-60`, tapi tidak ada skrip yang memeriksa `articleRepo` menolak draft atau artikel terjadwal | Orang 1 |
+| **K-9** | **Ditutup** | Aturan "draft tidak bocor" tidak punya pengujian — **sudah diuji sejak 11 Sep 2026** | 12 pengecekan di `verify:all`, lolos uji mutasi | Orang 1 |
 | **K-5** | Rendah | 4 kerentanan **high** di dependensi | `npm audit --omit=dev` — lihat [rincian](#k-5--rincian-kerentanan-dependensi) | Orang 1 |
 | **K-6** | Rendah | Belum ada header keamanan (CSP, perlindungan *clickjacking*) | `next.config.ts` hanya berisi `reactCompiler: true` | Orang 5 |
 | **K-7** | Rendah | Proses kerja tanpa penjaga: `main` tidak dikunci, PR digabung tanpa review | PR #2 dan PR #3: 0 review. Tidak ada `.github/workflows/` | Orang 5 |
@@ -83,6 +83,11 @@ footer. Ini tidak mengamankan apa pun — alamatnya tetap bisa ditebak — tapi 
 mengiklankannya.
 
 ### K-9 — aturan terpenting justru tidak teruji
+
+> **Ditutup 11 September 2026.** `verify:all` sekarang punya 12 pengecekan dari sisi publik: empat
+> kasus (draft, terjadwal besok, diarsipkan, sudah terbit) dikali tiga jalur (alamat, daftar,
+> pencarian). Diuji balik dengan sengaja merusak `syaratTerbit()` — menghapus syarat tanggal atau
+> syarat status masing-masing langsung menghasilkan 3 FAIL. Catatan di bawah dibiarkan sebagai riwayat.
 
 Aturan "artikel hanya terlihat publik kalau `PUBLISHED` **dan** tanggal terbitnya sudah lewat"
 memang ditegakkan di query Prisma:
@@ -139,7 +144,7 @@ Yang sebaiknya dilakukan:
 | **Penyimpanan password** | `prisma/schema.prisma` | Hanya kolom `passwordHash`. Tidak ada kolom password asli |
 | **Password ikut terbawa** | `src/server/repositories/user-repository.ts` | Pencarian yang membawa hash dipisah ke fungsi khusus `findByEmailWithSecret()`. Fungsi lain tidak membawanya |
 | **Akun bawaan** | `prisma/seed.ts` | **Tidak ada** akun admin bawaan seperti `admin/admin123` |
-| **Draft bocor** | Aturan tampil publik | **Ditegakkan** di query Prisma: `PUBLISHED` **dan** `publishedAt` sudah lewat. **Belum diuji** — lihat K-9 |
+| **Draft bocor** | Aturan tampil publik | **Ditegakkan** di query Prisma: `PUBLISHED` **dan** `publishedAt` sudah lewat. **Diuji** 12 pengecekan di `verify:all`, dan terbukti menangkap kerusakan |
 | **Parameter halaman jahat** | `listPublished({ page: -5, perPage: 99999 })` | Dipaksa jadi halaman 1 dan maksimal 50 per halaman — **diuji** di `verify:repo`, jadi tidak bisa dipakai untuk menyedot seluruh isi database sekaligus |
 | **Salah setelan di produksi** | `src/server/repositories/index.ts` | `DATA_SOURCE` yang salah ketik menghentikan aplikasi, bukan diam-diam memakai data contoh |
 | **Database antar anggota** | `.env.example` | Setiap anggota diwajibkan memakai database Neon sendiri |
@@ -153,7 +158,7 @@ paling mendesak.
 
 | Siapa | Yang dia coba | Pertahanan sekarang | Status |
 |---|---|---|---|
-| Pengunjung iseng | Menebak alamat artikel draft | Aturan tampil publik di lapisan data | ⚠️ ada, belum diuji — **K-9** |
+| Pengunjung iseng | Menebak alamat artikel draft | Aturan tampil publik di lapisan data, sudah diuji | ✅ |
 | Pengunjung iseng | Membuka `/admin` lalu menghapus artikel | Tidak ada | ❌ **K-1** |
 | Pengunjung iseng | Menyisipkan skrip lewat isi artikel | React meng-*escape* keluaran | ✅ |
 | Penyerang | Injeksi SQL lewat kolom pencarian | Query lewat Prisma | ✅ |
@@ -211,7 +216,7 @@ Semua baris harus **PASS**. Yang belum dicek ditulis `NOT_RUN`, bukan dianggap l
 | 2 | Semua halaman `/admin` mengalihkan pengunjung yang belum login | FAIL — belum ada |
 | 3 | Setiap Server Action penulis data memeriksa sesi sendiri | FAIL — belum ada |
 | 4 | Setiap input dari luar divalidasi | FAIL — belum ada |
-| 4a | Aturan "draft tidak bocor" diuji otomatis | FAIL — belum ada, lihat K-9 |
+| 4a | Aturan "draft tidak bocor" diuji otomatis | **PASS** — 12 pengecekan di `verify:all` |
 | 5 | `DATA_SOURCE=prisma` di setelan produksi | NOT_RUN — belum deploy |
 | 6 | Database produksi terpisah dari database pengembangan | NOT_RUN — belum deploy |
 | 7 | Tidak ada rahasia di riwayat git | **PASS** |

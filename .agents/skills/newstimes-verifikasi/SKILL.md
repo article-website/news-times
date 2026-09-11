@@ -69,9 +69,10 @@ npm run verify:all     NOT_RUN — tidak ada database di lingkungan ini
 
 ## Celah yang perlu diketahui
 
-Aturan **"draft tidak bocor"** belum punya pengecekan otomatis (`docs/KEAMANAN.md` temuan K-9).
-Kalau perubahanmu menyentuh `src/server/repositories/prisma-article-repository.ts`, periksa manual
-bahwa kondisi ini tetap ada:
+Aturan **"draft tidak bocor"** diuji 12 pengecekan di `npm run verify:all` — tapi **hanya kalau ada
+database**. Kalau perubahanmu menyentuh `src/server/repositories/prisma-article-repository.ts` dan
+kamu tidak bisa menjalankan `verify:all`, laporkan `NOT_RUN` dan periksa manual bahwa kondisi ini
+tetap ada:
 
 ```ts
 status: "PUBLISHED" as const,

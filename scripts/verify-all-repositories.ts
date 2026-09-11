@@ -9,6 +9,9 @@
  * Uji Prisma menulis ke database sungguhan, lalu MEMBERSIHKAN sendiri barisnya
  * di akhir. Semua data uji diawali "uji-" supaya gampang dikenali.
  *
+ * Khusus Prisma, ada satu rangkaian tambahan: aturan tampil publik dari sisi
+ * articleRepo (temuan K-9 di docs/KEAMANAN.md). Penjelasannya di fungsinya.
+ *
  * Jalankan: npm run verify:all
  */
 // Wajib paling atas: memuat .env sebelum modul lain dimuat.
@@ -24,6 +27,7 @@ import { inMemoryNewsletterRepository } from "@/server/repositories/in-memory-ne
 import { inMemoryUserRepository } from "@/server/repositories/in-memory-user-repository";
 
 import { prismaArticleAdminRepository } from "@/server/repositories/prisma-article-admin-repository";
+import { prismaArticleRepository } from "@/server/repositories/prisma-article-repository";
 import { prismaNewsletterRepository } from "@/server/repositories/prisma-newsletter-repository";
 import { prismaUserRepository } from "@/server/repositories/prisma-user-repository";
 
@@ -43,6 +47,7 @@ function cek(nama: string, syarat: boolean, detail = "") {
 const UJI_EMAIL = "uji-orang1@contoh.test";
 const UJI_EMAIL_NEWS = "uji-newsletter@contoh.test";
 const UJI_SLUG = "uji-artikel-orang1";
+const UJI_PREFIX_PUBLIK = "uji-publik-";
 
 interface Trio {
   userRepo: UserRepository;
@@ -175,6 +180,65 @@ async function ujiAdmin({ adminRepo }: Trio) {
   cek("hapus id tidak ada -> false", (await adminRepo.remove("id-hantu-xyz")) === false);
 }
 
+/**
+ * Aturan "draft tidak bocor", diuji dari sisi PUBLIK.
+ *
+ * Sebelum ini, aturannya cuma ditegakkan di syaratTerbit() tanpa satu pun uji
+ * dari sisi articleRepo. Kalau syarat itu rusak, semua uji lain tetap lulus.
+ *
+ * Hanya untuk Prisma. Di mode data contoh, articleRepo membaca articles.ts
+ * sedangkan articleAdminRepo menyimpan di memori terpisah - artikel buatan admin
+ * memang tidak pernah muncul di sisi publik, jadi uji ini tidak membuktikan
+ * apa-apa di sana.
+ *
+ * Kasus "sudah terbit" itu kontrol positif. Tanpa dia, findBySlug yang rusak dan
+ * selalu mengembalikan null juga akan lulus semua uji "tersembunyi".
+ */
+async function ujiVisibilitasPublik() {
+  console.log("\n  -- Aturan tampil publik (articleRepo) --");
+
+  const kemarin = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const besok = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  const isi = {
+    title: "Artikel Uji Visibilitas",
+    excerpt: "Ringkasan uji.",
+    content: "Isi uji.",
+    categorySlug: "teknologi",
+    authorSlug: "bayu-saputra",
+  };
+
+  const kasus = [
+    { nama: "draft", slug: "draft", status: "DRAFT", publishedAt: null, harusTerlihat: false },
+    { nama: "terjadwal besok", slug: "terjadwal", status: "PUBLISHED", publishedAt: besok, harusTerlihat: false },
+    { nama: "diarsipkan", slug: "arsip", status: "ARCHIVED", publishedAt: kemarin, harusTerlihat: false },
+    { nama: "sudah terbit", slug: "terbit", status: "PUBLISHED", publishedAt: kemarin, harusTerlihat: true },
+  ] as const;
+
+  for (const k of kasus) {
+    await prismaArticleAdminRepository.create({
+      ...isi,
+      slug: UJI_PREFIX_PUBLIK + k.slug,
+      status: k.status,
+      publishedAt: k.publishedAt,
+    });
+  }
+
+  // Draft bisa bocor lewat tiga jalan: alamat yang ditebak, daftar, dan pencarian.
+  const daftar = await prismaArticleRepository.listPublished({ perPage: 50 });
+  const cari = await prismaArticleRepository.search("Artikel Uji Visibilitas", { perPage: 50 });
+
+  for (const k of kasus) {
+    const slug = UJI_PREFIX_PUBLIK + k.slug;
+    const harapan = k.harusTerlihat ? "terlihat" : "tersembunyi";
+
+    const lewatAlamat = (await prismaArticleRepository.findBySlug(slug)) !== null;
+    cek(`${k.nama}: ${harapan} lewat alamat`, lewatAlamat === k.harusTerlihat);
+    cek(`${k.nama}: ${harapan} di daftar`, daftar.items.some((a) => a.slug === slug) === k.harusTerlihat);
+    cek(`${k.nama}: ${harapan} di pencarian`, cari.items.some((a) => a.slug === slug) === k.harusTerlihat);
+  }
+}
+
 async function jalankan(nama: string, trio: Trio) {
   console.log(`\n${"=".repeat(46)}`);
   console.log(`  ${nama}`);
@@ -197,6 +261,7 @@ async function bersihkanPrisma() {
     where: { email: { in: [UJI_EMAIL, "uji-kedua@contoh.test"] } },
   });
   await prisma.article.deleteMany({ where: { slug: UJI_SLUG } });
+  await prisma.article.deleteMany({ where: { slug: { startsWith: UJI_PREFIX_PUBLIK } } });
 
   console.log("\n  Data uji sudah dibersihkan dari database.");
 }
@@ -217,6 +282,7 @@ async function main() {
         newsletterRepo: prismaNewsletterRepository,
         adminRepo: prismaArticleAdminRepository,
       });
+      await ujiVisibilitasPublik();
     } finally {
       await bersihkanPrisma();
     }

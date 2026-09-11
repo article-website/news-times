@@ -785,7 +785,7 @@ Kondisi ini bisa berubah. Yang paling mutakhir selalu ada di [STATUS.md](../STAT
 - Lima tabel database beserta rancangan, riwayat perubahan, dan data awalnya
 - Empat kumpulan fungsi pengambil data, masing-masing punya dua versi
 - Halaman depan, daftar artikel, detail artikel, tentang kami, dan halaman redaksi
-- 151 pengecekan otomatis, semuanya lulus
+- 163 pengecekan otomatis, semuanya lulus
 
 ### Belum jalan
 

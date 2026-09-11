@@ -161,7 +161,7 @@ teks(s, TEPI, Inches(3.7), Inches(8.5), Inches(0.8),
      warna=RGBColor(0xCB, 0xD5, 0xE1))
 teks(s, TEPI, Inches(5.6), ISI, Inches(0.9),
      ["Tim 5 orang  ·  Next.js 16  ·  PostgreSQL di Neon",
-      "10 September 2026  ·  kondisi main di commit f979128"],
+      "11 September 2026"],
      ukuran=14, warna=REDUP, spasi=Pt(4))
 catatan(s, "Perkenalan singkat. Sebut ini laporan progres, bukan demo produk "
            "jadi — supaya harapan pendengar pas sejak awal.")
@@ -173,7 +173,7 @@ s = slide_baru()
 judul_halaman(s, "Kalau cuma sempat dengar satu slide", "ringkasan")
 poin(s, [
     ("Fondasi datanya sudah selesai dan terbukti jalan",
-     "5 tabel, 4 kumpulan fungsi akses data, 151 pengecekan otomatis lulus"),
+     "5 tabel, 4 kumpulan fungsi akses data, 163 pengecekan otomatis lulus"),
     ("Tapi belum ada satu halaman pun yang memakainya",
      "Semua halaman masih membaca 5 artikel yang ditulis tangan di dalam kode"),
     ("Redaksi belum bisa menerbitkan artikel sendiri",
@@ -327,16 +327,16 @@ catatan(s, "Kaitkan dengan risiko yang masih terbuka sekarang: tautan halaman "
 # 9 — Bukti
 # =============================================================================
 s = slide_baru()
-judul_halaman(s, "151 pengecekan otomatis, semuanya lulus", "bukti")
+judul_halaman(s, "163 pengecekan otomatis, semuanya lulus", "bukti")
 teks(s, TEPI, Inches(1.9), ISI, Inches(0.4),
-     "Dijalankan ulang 10 September 2026, bukan hasil lama",
+     "Dijalankan ulang 11 September 2026, bukan hasil lama",
      ukuran=14, warna=REDUP)
 tabel(s, ["Perintah", "Hasil"], [
     ["npm run typecheck", ("PASS", HIJAU)],
     ["npm run build", ("PASS — 6 halaman", HIJAU)],
     ["npm run verify:repo", ("PASS — 37 pengecekan", HIJAU)],
     ["npm run verify:compare", ("PASS — 20 sama, 0 beda", HIJAU)],
-    ["npm run verify:all", ("PASS — 94 pengecekan", HIJAU)],
+    ["npm run verify:all", ("PASS — 106 pengecekan", HIJAU)],
     ["npm run lint", ("2 error, 5 warning", KUNING)],
     ["Uji database manual & pemeriksaan browser", ("NOT_RUN sejak PR #3", KUNING)],
 ], atas=Inches(2.4), lebar_kolom=[Inches(6.4), Inches(5.1)])

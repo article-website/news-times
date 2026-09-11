@@ -210,8 +210,8 @@ Sekarang seed dipanggil eksplisit di `package.json`.
 
 ## 6. Bukti pengujian
 
-Semua baris ini **dijalankan ulang pada 10 September 2026** di `main` (commit `f9f4ece`), setelah
-PR #2 dan PR #3 digabung. Bukan hasil lama dari branch pengembangan.
+Semua baris ini **dijalankan ulang pada 11 September 2026** di `main`, setelah PR #2 dan PR #3
+digabung. Bukan hasil lama dari branch pengembangan.
 
 | Perintah | Hasil |
 |---|---|
@@ -219,10 +219,15 @@ PR #2 dan PR #3 digabung. Bukan hasil lama dari branch pengembangan.
 | `npm run build` | **PASS** — 6 halaman |
 | `npm run verify:repo` | **PASS** — 37 pengecekan |
 | `npm run verify:compare` | **PASS** — 20 sama, 0 beda |
-| `npm run verify:all` | **PASS** — 94 pengecekan |
+| `npm run verify:all` | **PASS** — 106 pengecekan |
 | `npm run lint` | 2 error, 5 warning — keduanya di luar berkas bagian ini |
 
-Total **151 pengecekan otomatis lulus**. Tidak ada satu pun yang diasumsikan jalan.
+Total **163 pengecekan otomatis lulus**. Tidak ada satu pun yang diasumsikan jalan.
+
+> **Ditambahkan 11 September 2026:** 12 pengecekan aturan tampil publik di `verify:all`, menutup celah
+> K-9 di [KEAMANAN.md](./KEAMANAN.md). Sebelumnya aturan "draft tidak bocor" ditegakkan di kode tapi
+> tidak pernah diuji dari sisi pengunjung. Pengujian barunya dibuktikan lewat uji mutasi: syarat di
+> `syaratTerbit()` sengaja dirusak, dan pengujiannya langsung gagal.
 
 Pengujian berikut **PASS pada pengujian sebelumnya dan belum diulang** setelah PR #3 masuk:
 membuat tabel, mengisi data awal, `db:reset`, serta pemeriksaan manual halaman depan, daftar,
@@ -233,7 +238,7 @@ detail, dan tentang.
 ```bash
 npm run verify:repo      # 37 pengecekan, tidak butuh database
 npm run verify:compare   # bandingkan data contoh vs database
-npm run verify:all       # 94 pengecekan admin, login, newsletter
+npm run verify:all       # 106 pengecekan admin, login, newsletter, aturan tampil publik
 ```
 
 Yang paling penting `verify:compare`. Dia membandingkan hasil kedua implementasi **kolom per

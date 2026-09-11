@@ -27,7 +27,7 @@
 | Kerangka pengujian (Vitest, Jest, Playwright) | **Tidak** — belum terpasang di `package.json` |
 | Folder `tests/` | **Tidak** |
 | Pengecekan otomatis saat membuka PR | **Tidak** — belum ada `.github/workflows/` |
-| Skrip verifikasi yang dijalankan manual | **Ya**, tiga skrip, total 151 pengecekan |
+| Skrip verifikasi yang dijalankan manual | **Ya**, tiga skrip, total 163 pengecekan |
 
 Jadi proyek ini **punya pengujian, tapi belum punya sistem pengujian.** Pengecekan yang ada sungguhan
 dan berguna, tapi hanya berjalan kalau seseorang ingat menjalankannya.
@@ -42,7 +42,7 @@ Semuanya di folder `scripts/`, dijalankan lewat `npm run`.
 |---|---|---|---|
 | `npm run verify:repo` | `articleRepo` versi data contoh: penerjemah tanggal (termasuk menolak 31 Februari), pembuat slug, urutan dan pembagian halaman, daftar tidak membawa isi artikel, **penolakan parameter jahat** (halaman negatif, 99.999 per halaman), cari per alamat, per kategori, pencarian, populer, unggulan | **Tidak** | PASS — 37 |
 | `npm run verify:compare` | Hasil versi data contoh vs versi database, dibandingkan kolom per kolom | Ya | PASS — 20 sama, 0 beda |
-| `npm run verify:all` | `userRepo`, `newsletterRepo`, dan `articleAdminRepo` — rangkaian uji yang **sama** dijalankan ke kedua versi | Ya | PASS — 94 |
+| `npm run verify:all` | `userRepo`, `newsletterRepo`, dan `articleAdminRepo` — rangkaian uji yang **sama** dijalankan ke kedua versi — ditambah **aturan tampil publik** dari sisi `articleRepo` (12 pengecekan, hanya Prisma) | Ya | PASS — 106 |
 
 Hasil terakhir dari 10 September 2026. Ada juga `npm run coba` — bukan pengujian, melainkan ruang
 percobaan untuk memanggil fungsi secara langsung.
@@ -59,13 +59,17 @@ percobaan untuk memanggil fungsi secara langsung.
 
 ## 3. Celah terbesar
 
-### 3.1 Aturan "draft tidak bocor" tidak diuji
+### 3.1 Aturan "draft tidak bocor" — sudah ditutup 11 September 2026
 
-Ini celah yang paling penting, dan detailnya ada di [KEAMANAN.md temuan K-9](./KEAMANAN.md#k-9--aturan-terpenting-justru-tidak-teruji).
+Sebelumnya ini celah terbesar: aturannya ditegakkan di query Prisma, tapi tidak ada pengecekan dari
+sisi publik. Sekarang `verify:all` menguji empat kasus — draft, terjadwal besok, diarsipkan, dan
+sudah terbit — lewat tiga jalur: alamat, daftar, dan pencarian.
 
-Ringkasnya: aturan itu ditegakkan di query Prisma, tapi **tidak ada pengecekan yang memeriksa sisi
-publik**. `verify:all` hanya menguji perilaku draft di sisi admin. Kalau aturannya rusak, ke-151
-pengecekan tetap lulus.
+**Terbukti bisa menangkap kerusakan.** Syarat tanggal dan syarat status di `syaratTerbit()` dihapus
+bergantian dengan sengaja; masing-masing langsung menghasilkan 3 FAIL. Kasus "sudah terbit" menjadi
+kontrol positif — tanpa itu, fungsi yang rusak dan selalu mengembalikan kosong juga akan lulus.
+
+Riwayat lengkapnya di [KEAMANAN.md temuan K-9](./KEAMANAN.md#k-9--aturan-terpenting-justru-tidak-teruji).
 
 ### 3.2 Tampilan tidak diuji sama sekali
 
@@ -100,7 +104,7 @@ membocorkan data** — urutannya di bagian berikut. Angka cakupan tidak dijadika
 
 | Prioritas | Yang diuji | Kenapa | Jenis | Status |
 |---|---|---|---|---|
-| **1** | Draft dan artikel terjadwal tidak terlihat publik | Kalau rusak, isi yang belum boleh terbit bocor | Pengecekan lapisan data | ❌ Belum — K-9 |
+| **1** | Draft dan artikel terjadwal tidak terlihat publik | Kalau rusak, isi yang belum boleh terbit bocor | Pengecekan lapisan data | ✅ `verify:all` — 12 pengecekan, lolos uji mutasi |
 | **2** | Halaman redaksi menolak yang belum login, dan Server Action menolak tanpa sesi | Kalau rusak, siapa pun bisa menghapus artikel | Pengecekan sisi server | ❌ Login belum ada |
 | **3** | Validasi input menolak isian yang tidak sah | Batas pertama sebelum data masuk database | Pengujian unit — murah dan cepat | ❌ Validasi belum ada |
 | **4** | Alur utuh: login → tulis → terbitkan → muncul di halaman depan | Ini kriteria selesai nomor 1 di [PRD](./PRD.md#10-kriteria-selesai) | Pengujian alur di browser | ❌ |
@@ -108,8 +112,8 @@ membocorkan data** — urutannya di bagian berikut. Angka cakupan tidak dijadika
 | **6** | Kedua versi repository berperilaku sama | Kalau berbeda, halaman rusak saat pindah ke database | Perbandingan | ✅ `verify:compare`, `verify:all` |
 | **7** | Tampilan loading, error, dan kosong | Pengalaman pengguna saat ada masalah | Pemeriksaan manual dulu | ❌ Berkasnya belum ada |
 
-**Prioritas 1 bisa dikerjakan sekarang juga** tanpa menunggu siapa pun — cukup tiga pengecekan
-tambahan di `scripts/verify-all-repositories.ts`. Rinciannya di [KEAMANAN.md](./KEAMANAN.md#k-9--aturan-terpenting-justru-tidak-teruji).
+**Prioritas 1 sudah selesai.** Prioritas 2 dan 3 baru bisa dikerjakan setelah login dan validasi
+input dibuat — keduanya sebaiknya ditulis bersamaan dengan fiturnya, bukan belakangan.
 
 ---
 

@@ -2,7 +2,8 @@
 
 > **Diperbarui:** 11 September 2026 · **Kode aplikasi terakhir berubah di commit `f9f4ece`**
 >
-> Semua commit setelah `f9f4ece` isinya dokumentasi dan konfigurasi agent, bukan kode aplikasi.
+> Semua commit setelah `f9f4ece` isinya dokumentasi, konfigurasi agent, skrip pengujian, dan
+> konfigurasi lint — bukan kode aplikasi di `src/`.
 > Karena itu seluruh hasil pengujian di bawah masih berlaku. Kalau ada commit yang mengubah isi
 > `src/`, `prisma/`, atau `package.json`, jalankan ulang pengujiannya dan perbarui tanggal di atas.
 >
@@ -30,7 +31,7 @@ yang memakainya.** Seluruh halaman masih membaca 5 artikel yang ditulis tangan d
 
 | Bagian | Status | Bukti / catatan |
 |---|---|---|
-| Lapisan data (schema, repository, seed) | **Selesai** | PR #2 digabung 5 Sep 2026; 151 pengecekan otomatis lulus |
+| Lapisan data (schema, repository, seed) | **Selesai** | PR #2 digabung 5 Sep 2026; 163 pengecekan otomatis lulus |
 | Tampilan publik | **Sebagian** | Halaman ada, tapi datanya masih dari `articles.ts`; 6 menu kategori masih `href="#"` |
 | Halaman admin | **Sebagian** | `/admin` ada (PR #3), tapi menyimpan ke `localStorage`, bukan database |
 | Login & penguncian `/admin` | **Belum** | Tabel `User` siap, sistemnya belum dibuat. Tautan `/admin` sudah publik di footer |
@@ -50,6 +51,9 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
   data contoh (in-memory) dan Prisma. Ditukar lewat satu variabel di `.env.local`
 - Halaman: `/`, `/articles`, `/articles/[slug]`, `/about`, `/admin`
 - Alamat artikel yang salah menampilkan halaman "tidak ditemukan"
+- Aturan tampil publik — draft, artikel terjadwal, dan artikel arsip tidak terlihat lewat alamat,
+  daftar, maupun pencarian — diuji 12 pengecekan di `verify:all`, dan terbukti menangkap kerusakan
+  lewat uji mutasi (11 September 2026)
 
 ## Yang belum jalan
 
@@ -63,7 +67,6 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
 | Admin tidak menyimpan ke database | `src/app/admin/page.tsx` bertanda `"use client"` dan memakai `localStorage` |
 | Tampilan loading & error | Belum ada `loading.tsx` maupun `error.tsx` di mana pun |
 | Pengecekan otomatis | Tidak ada `.github/workflows/`; `npm run lint` masih 2 error sehingga CI akan langsung merah |
-| Aturan "draft tidak bocor" belum diuji | Ditegakkan di `src/server/repositories/prisma-article-repository.ts:59-60`, tapi tidak ada skrip yang memeriksa sisi publik. Kalau baris itu rusak, 151 pengecekan tetap lulus — `docs/KEAMANAN.md` temuan K-9 |
 
 ---
 
@@ -126,7 +129,8 @@ Anggota organisasi ada 5: `kvnlhm`, `azridalimunthe7`, `fikarnugraha18`, `astroc
 
 ## Perintah dan hasil terakhir
 
-Semuanya dijalankan **10 September 2026** pada commit `f9f4ece`.
+Semuanya dijalankan ulang **11 September 2026**, setelah pengujian aturan tampil publik ditambahkan
+dan `.claude/` dikecualikan dari lint.
 
 | Perintah | Hasil terakhir |
 |---|---|
@@ -135,7 +139,7 @@ Semuanya dijalankan **10 September 2026** pada commit `f9f4ece`.
 | `npm run lint` | **2 error, 5 warning** — `src/components/Footer.tsx:21` dan `src/app/admin/page.tsx:23` |
 | `npm run verify:repo` | **PASS** — 37 pengecekan, tidak butuh database |
 | `npm run verify:compare` | **PASS** — 20 sama, 0 beda |
-| `npm run verify:all` | **PASS** — 94 pengecekan, butuh database |
+| `npm run verify:all` | **PASS** — 106 pengecekan, butuh database |
 | `npm run db:migrate` / `db:seed` / `db:reset` | **NOT_RUN** sejak PR #3 masuk (terakhir PASS 5 Sep) |
 | Pemeriksaan manual di browser | **NOT_RUN** sejak PR #3 masuk |
 
