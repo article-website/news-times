@@ -135,9 +135,13 @@ Sembilan aturan, selengkapnya di [AGENTS.md](./AGENTS.md). Berlaku untuk anggota
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Prisma 7 ·
 PostgreSQL di [Neon](https://neon.tech) · rencana hosting di Vercel.
 
-Folder `.claude/` berisi konfigurasi agent AI ([ECC](https://github.com/affaan-m/ecc), profil
-minimal, tanpa hook runtime). Itu bukan bagian dari aplikasi — tidak ada skrip yang berjalan
-otomatis, dan boleh diabaikan kalau kamu tidak memakai agent.
+Dua folder berisi konfigurasi agent AI, bukan bagian dari aplikasi — boleh diabaikan kalau kamu tidak
+memakai agent:
+
+- `.claude/` — untuk Claude Code ([ECC](https://github.com/affaan-m/ecc), profil minimal, tanpa hook
+  runtime, jadi tidak ada skrip yang berjalan otomatis)
+- [`.agents/`](./.agents/README.md) — aturan, skill, dan alur kerja proyek untuk agent lain seperti
+  Codex dan Antigravity
 
 ---
 

@@ -103,7 +103,8 @@ src/components/          komponen tampilan                -> Orang 2
 src/data/articles.ts     data contoh, BEKU
 scripts/                 skrip verifikasi
 docs/                    dokumentasi tim
-.claude/                 konfigurasi agent (ECC, profil minimal, tanpa hooks)
+.claude/                 konfigurasi Claude Code (ECC, profil minimal, tanpa hooks)
+.agents/                 aturan, skill, dan alur kerja untuk agent selain Claude
 ```
 
 ---

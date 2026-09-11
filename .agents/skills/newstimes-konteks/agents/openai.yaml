@@ -1,0 +1,7 @@
+interface:
+  display_name: "NewsTimes: Orientasi Proyek"
+  short_description: "Kondisi terkini, peta folder, dan aturan proyek NewsTimes"
+  brand_color: "#2563EB"
+  default_prompt: "Use $newstimes-konteks to get oriented in the NewsTimes repo before changing any file."
+policy:
+  allow_implicit_invocation: true

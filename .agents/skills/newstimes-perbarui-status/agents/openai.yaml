@@ -1,0 +1,7 @@
+interface:
+  display_name: "NewsTimes: Perbarui STATUS.md"
+  short_description: "Memperbarui STATUS.md setelah pekerjaan selesai"
+  brand_color: "#2563EB"
+  default_prompt: "Use $newstimes-perbarui-status to update STATUS.md after finishing work on NewsTimes."
+policy:
+  allow_implicit_invocation: true

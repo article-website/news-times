@@ -73,3 +73,9 @@ dipakai sebagai dasar mengubah kode.
 | [CONTRIBUTING.md](./CONTRIBUTING.md) | Alur branch, commit, dan PR |
 
 Setelah menyelesaikan pekerjaan, perbarui `STATUS.md` — caranya ada di bagian bawah berkas itu.
+
+## Untuk agent selain Claude
+
+Folder [`.agents/`](./.agents/README.md) berisi aturan, skill, dan alur kerja proyek ini dalam format
+yang dipakai Codex dan Antigravity. Skill yang tersedia: `newstimes-konteks`, `newstimes-akses-data`,
+`newstimes-verifikasi`, `newstimes-perbarui-status`.
