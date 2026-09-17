@@ -1,0 +1,7 @@
+interface:
+  display_name: "NewsTimes: Verifikasi"
+  short_description: "Menjalankan pengecekan dan melaporkan PASS/FAIL/NOT_RUN"
+  brand_color: "#2563EB"
+  default_prompt: "Use $newstimes-verifikasi to run the NewsTimes checks and report results as PASS, FAIL, or NOT_RUN."
+policy:
+  allow_implicit_invocation: true

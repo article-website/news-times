@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
     // dan tidak bisa kita perbaiki. Tanpa baris ini, `npm run lint`
     // memuntahkan ratusan error yang tidak ada hubungannya dengan kode kita.
     "src/generated/**",
+    // Konfigurasi agent AI (ECC) - skrip pihak ketiga, bukan kode aplikasi.
+    // Tanpa baris ini, ECC menambah 18 error lint yang tidak bisa dan tidak
+    // perlu kita perbaiki.
+    ".claude/**",
   ]),
 ]);
 

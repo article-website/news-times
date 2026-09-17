@@ -6,9 +6,19 @@ Panduan pembagian tugas **5 orang** untuk membuat backend NewsTimes, sampai webs
 Dokumen ini dibuat supaya semua orang bisa kerja bareng tanpa saling tabrakan dan tanpa saling
 menunggu.
 
-> **Catatan:** rencana ini disusun untuk 5 peran, tapi anggota di organisasi GitHub ternyata
-> ada **4 orang**. Jadi pembagiannya perlu disesuaikan — entah dua peran digabung, atau ada
-> anggota yang belum diundang. Bahas ini dulu sebelum mulai.
+> **Catatan (10 Sep 2026):** anggota organisasi GitHub sekarang sudah **5 orang**, jadi jumlahnya
+> pas dengan 5 peran di bawah. Yang belum jelas tinggal siapa yang memegang **Orang 4** dan
+> **Orang 5**. Bahas ini dulu sebelum mulai.
+
+## Dokumen lain yang perlu dibaca
+
+| Dokumen | Isinya |
+|---|---|
+| [PRD.md](./PRD.md) | Apa yang dibangun dan kenapa: pengguna, lingkup, daftar kebutuhan beserta statusnya, dan hal-hal yang masih harus diputuskan |
+| [DATABASE.md](./DATABASE.md) | Cara mengambil dan menyimpan data. **Baca ini sebelum mulai ngoding** |
+| [LAPORAN-DATABASE.md](./LAPORAN-DATABASE.md) | Laporan pekerjaan bagian database: keputusan yang diambil beserta alasannya, dan bukti pengujiannya |
+
+Dokumen ini sendiri isinya *siapa mengerjakan apa dan kapan*.
 
 ## Kondisi repo sekarang
 
@@ -190,6 +200,9 @@ Prisma sama sekali, dan perintah `npm run db:seed` bisa ngisi ulang database dar
 >
 > Cara memakainya ada di **[DATABASE.md](./DATABASE.md)** — baca itu sebelum
 > mulai ngoding bagianmu.
+>
+> Laporan lengkapnya — apa yang dibuat, keputusan apa yang diambil dan kenapa,
+> serta bukti pengujiannya — ada di **[LAPORAN-DATABASE.md](./LAPORAN-DATABASE.md)**.
 >
 > Ringkasnya: **kamu tidak perlu punya database sendiri untuk mulai bekerja.**
 > Cukup `cp .env.example .env.local` lalu `npm run dev`, dan data contohnya

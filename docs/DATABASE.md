@@ -272,7 +272,7 @@ npm run db:reset        # HAPUS SEMUA, bikin ulang, isi ulang
 
 npm run verify:repo     # 37 pengecekan, tidak butuh database
 npm run verify:compare  # membandingkan data contoh vs database
-npm run verify:all      # 94 pengecekan untuk admin, login, newsletter
+npm run verify:all      # 106 pengecekan: admin, login, newsletter, aturan tampil publik
 ```
 
 `npm run db:reset` menghapus seluruh isi database secara permanen. Jangan pernah
@@ -289,7 +289,8 @@ dijalankan ke database yang dipakai sungguhan.
 ## Beda kecil antara data contoh dan database
 
 Sudah diuji: **20 dari 20** pengecekan artikel hasilnya sama persis, dan **94
-dari 94** pengecekan admin, login, serta newsletter lulus di kedua versi.
+dari 94** pengecekan admin, login, serta newsletter lulus di kedua versi. Ditambah 12 pengecekan
+aturan tampil publik yang khusus dijalankan ke database.
 
 Ada dua kolom yang sengaja tidak dibandingkan, dan keduanya bukan kesalahan:
 

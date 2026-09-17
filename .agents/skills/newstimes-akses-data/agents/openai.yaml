@@ -1,0 +1,7 @@
+interface:
+  display_name: "NewsTimes: Akses Data"
+  short_description: "Mengambil dan menyimpan data lewat repository"
+  brand_color: "#2563EB"
+  default_prompt: "Use $newstimes-akses-data to read or write NewsTimes data through the repository layer."
+policy:
+  allow_implicit_invocation: true
