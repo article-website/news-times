@@ -1,10 +1,11 @@
-import { Article } from "../data/articles";
+import type { ArticleSummary } from "@/server/domain/article";
+
 import PopularArticles from "./PopularArticles";
-import CategoryList from "./CategoryList";
 import NewsletterForm from "./NewsletterForm";
+import CategoryList from "./CategoryList";
 
 interface SidebarProps {
-  popularArticles: Article[];
+  popularArticles: ArticleSummary[];
 }
 
 export default function Sidebar({ popularArticles }: SidebarProps) {
