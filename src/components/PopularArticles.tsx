@@ -1,16 +1,9 @@
-import { articleRepo } from "@/server/repositories";
+import type { ArticleSummary } from "@/server/domain/article";
 import Image from "next/image";
 import Link from "next/link";
 
-interface articleRepo {
-  slug: string;
-  title: string;
-  imageUrl: string | null;
-  publishedAt: Date | null;
-}
-
 interface PopularArticlesProps {
-  articles: articleRepo[];
+  articles: ArticleSummary[];
 }
 
 export default function PopularArticles({ articles }: PopularArticlesProps) {
@@ -31,12 +24,12 @@ export default function PopularArticles({ articles }: PopularArticlesProps) {
               <Image
                 src={article.imageUrl}
                 alt={article.title}
-                width={160}
-                height={112}
-                className="w-40 h-28 object-cover rounded-lg shrink-0"
+                width={56}
+                height={56}
+                className="w-14 h-14 object-cover rounded-md shrink-0"
               />
             ) : (
-              <div className="w-40 h-28 rounded-lg shrink-0 bg-gray-200" />
+              <div className="w-14 h-14 rounded-md shrink-0 bg-gray-200" />
             )}
             <div>
               <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">

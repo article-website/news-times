@@ -1,21 +1,9 @@
-import { articleRepo } from "@/server/repositories";
+import type { ArticleSummary } from "@/server/domain/article";
 import Image from "next/image";
 import Link from "next/link";
 
-interface categoryRef {
-  name: string;
-}
-
-interface articleRepo {
-  slug: string;
-  title: string;
-  imageUrl: string | null;
-  publishedAt: Date | null;
-  category: categoryRef;
-}
-
 interface ArticleCardProps {
-  article: articleRepo;
+  article: ArticleSummary;
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {

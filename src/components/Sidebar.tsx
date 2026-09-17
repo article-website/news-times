@@ -1,30 +1,11 @@
-import { articleRepo } from "@/server/repositories";
+import type { ArticleSummary } from "@/server/domain/article";
 
 import PopularArticles from "./PopularArticles";
 import NewsletterForm from "./NewsletterForm";
 import CategoryList from "./CategoryList";
 
-interface categoryRef {
-  name: string;
-}
-
-interface authorRef {
-  name: string;
-}
-
-interface articleRepo {
-  slug: string;
-  title: string;
-  excerpt: string;
-  imageUrl: string | null;
-  publishedAt: Date | null;
-  viewCount: number;
-  category: categoryRef;
-  author: authorRef;
-}
-
 interface SidebarProps {
-  popularArticles: articleRepo[];
+  popularArticles: ArticleSummary[];
 }
 
 export default function Sidebar({ popularArticles }: SidebarProps) {

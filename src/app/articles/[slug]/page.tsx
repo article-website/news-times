@@ -16,6 +16,16 @@ export default async function ArticleDetailPage({
     notFound();
   }
 
+  await articleRepo.incrementViewCount(slug);
+
+  const tanggal = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "";
+
   return (
     <main className="max-w-3xl mx-auto px-6 py-10">
       {article.imageUrl ? (
@@ -34,10 +44,11 @@ export default async function ArticleDetailPage({
       </span>
       <h1 className="text-3xl font-bold mt-2 mb-3">{article.title}</h1>
       <p className="text-gray-500 text-sm mb-6">
-        {article.publishedAt?.toLocaleDateString("id-ID")} •{" "}
-        {article.author.name}
+        {tanggal} • {article.author.name}
       </p>
-      <p className="text-gray-700 leading-relaxed">{article.content}</p>
+      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+        {article.content}
+      </p>
     </main>
   );
 }

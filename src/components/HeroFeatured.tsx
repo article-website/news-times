@@ -3,23 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { articleRepo } from "@/server/repositories";
-
-interface authorRef {
-  name: string;
-}
-
-interface articleRepo {
-  slug: string;
-  title: string;
-  excerpt: string;
-  imageUrl: string | null;
-  publishedAt: Date | null;
-  author: authorRef;
-}
+import type { ArticleSummary } from "@/server/domain/article";
 
 interface HeroFeaturedProps {
-  articles: articleRepo[];
+  articles: ArticleSummary[];
 }
 
 export default function HeroFeatured({ articles }: HeroFeaturedProps) {
