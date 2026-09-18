@@ -34,7 +34,8 @@ Tiga tabrakan yang sudah diketahui:
 
 1. **Next.js 16 berbeda dari yang umum dikenal.** Contohnya `middleware.ts` sudah berganti nama jadi
    `proxy.ts`. Baca panduan di `node_modules/next/dist/docs/` sebelum menulis kode Next.js
-2. **Semua halaman masih memakai `src/data/articles.ts`, bukan database.** Jangan berasumsi data
-   sudah datang dari database hanya karena repository-nya sudah ada
+2. **Sejak PR #6, halaman sudah memakai repository — tapi `/admin` belum punya login.** Server
+   Action di `src/app/admin/actions.ts` menulis ke database tanpa memeriksa sesi. Jangan menambah
+   Server Action penulis data baru tanpa pemeriksaan sesi, dan jangan menganggap situs siap deploy
 3. **`"use client"` menutup akses ke database.** Berkas bertanda itu tidak bisa memanggil repository.
    Pakai Server Action

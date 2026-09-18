@@ -88,9 +88,9 @@ npm run verify:repo
 Pengecekan tambahan sesuai jenis perubahan ada di
 [docs/PENGUJIAN.md bagian 7](./docs/PENGUJIAN.md#7-sebelum-membuka-pull-request).
 
-> **Catatan per 11 September 2026:** `npm run lint` di `main` masih 2 error yang bukan dari
-> perubahanmu (`Footer.tsx:21` dan `admin/page.tsx:23`). Pastikan perubahanmu **tidak menambah**
-> error baru. Tulis di PR kalau error lama itu masih ada.
+> **Catatan per 18 September 2026:** `npm run lint` di `main` masih 1 error yang bukan dari
+> perubahanmu (`Footer.tsx:21`). Pastikan perubahanmu **tidak menambah** error baru. Tulis di PR
+> kalau error lama itu masih ada.
 
 ---
 

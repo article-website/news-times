@@ -1,11 +1,11 @@
 # STATUS — NewsTimes
 
-> **Diperbarui:** 11 September 2026 · **Kode aplikasi terakhir berubah di commit `f9f4ece`**
+> **Diperbarui:** 18 September 2026 · **Kode aplikasi terakhir berubah di commit `5a28131`**
+> (PR #6 digabung 17 Sep 2026)
 >
-> Semua commit setelah `f9f4ece` isinya dokumentasi, konfigurasi agent, skrip pengujian, dan
-> konfigurasi lint — bukan kode aplikasi di `src/`.
-> Karena itu seluruh hasil pengujian di bawah masih berlaku. Kalau ada commit yang mengubah isi
-> `src/`, `prisma/`, atau `package.json`, jalankan ulang pengujiannya dan perbarui tanggal di atas.
+> Seluruh hasil pengujian di bawah dijalankan ulang di `5a28131`. Kalau ada commit baru yang
+> mengubah isi `src/`, `prisma/`, atau `package.json`, jalankan ulang pengujiannya dan perbarui
+> tanggal di atas.
 >
 > Berkas ini ditujukan untuk **manusia maupun AI agent** yang baru membuka repo ini. Bacalah ini
 > lebih dulu sebelum mengubah apa pun. Cara memperbaruinya ada di bagian paling bawah.
@@ -21,9 +21,13 @@ NewsTimes adalah portal berita berbahasa Indonesia — satu aplikasi Next.js 16 
 TypeScript, Tailwind v4), database PostgreSQL di Neon lewat Prisma 7. Dikerjakan 5 orang sebagai
 proyek magang. Tidak ada backend terpisah; semuanya satu repo, satu deploy.
 
-**Inti kondisi sekarang:** lapisan datanya sudah jadi dan teruji, tapi **belum ada satu halaman pun
-yang memakainya.** Seluruh halaman masih membaca 5 artikel yang ditulis tangan di
-`src/data/articles.ts`. Jadi database sudah siap, tapi situsnya belum benar-benar memakai database.
+**Inti kondisi sekarang:** sejak PR #6, **situsnya sudah benar-benar memakai lapisan data.**
+Halaman publik membaca lewat `articleRepo`, dan `/admin` menulis ke database lewat Server Action.
+
+**Tapi ada satu masalah serius:** `/admin` dan Server Action-nya **belum punya login.** Siapa pun
+yang bisa membuka situs bisa menulis, menerbitkan, dan menghapus artikel di database. Ini persis
+skenario yang diperingatkan `docs/KEAMANAN.md` (K-1), dan sekarang sudah terjadi. **Situs tidak
+boleh di-deploy ke publik sebelum login dipasang.**
 
 ---
 
@@ -32,9 +36,9 @@ yang memakainya.** Seluruh halaman masih membaca 5 artikel yang ditulis tangan d
 | Bagian | Status | Bukti / catatan |
 |---|---|---|
 | Lapisan data (schema, repository, seed) | **Selesai** | PR #2 digabung 5 Sep 2026; 163 pengecekan otomatis lulus |
-| Tampilan publik | **Sebagian** | Halaman ada, tapi datanya masih dari `articles.ts`; 6 menu kategori masih `href="#"` |
-| Halaman admin | **Sebagian** | `/admin` ada (PR #3), tapi menyimpan ke `localStorage`, bukan database |
-| Login & penguncian `/admin` | **Belum** | Tabel `User` siap, sistemnya belum dibuat. Tautan `/admin` sudah publik di footer |
+| Tampilan publik | **Sebagian** | Sudah memakai `articleRepo` (PR #6). Belum ada halaman kategori & pencarian; 6 menu kategori masih `href="#"` |
+| Halaman admin | **Sebagian** | Tulis, edit, draft/terbit, dan hapus sudah tersimpan ke database (PR #6). Belum ada validasi, jadwal tayang, dan unggah gambar |
+| Login & penguncian `/admin` | **Belum — sekarang mendesak** | Tabel `User` siap, sistemnya belum dibuat. `/admin` sudah menulis ke database tanpa login, dan tautannya publik di footer |
 | Validasi & SEO | **Belum** | Belum ada Zod, sitemap, rss, robots, maupun metadata OG |
 | Deploy & pengecekan otomatis | **Belum** | Tidak ada `.github/workflows/`, tidak ada `tests/`, `main` belum dikunci |
 | Dokumentasi | **Selesai** | README, PRD, rencana kerja, panduan database, laporan database, dan berkas ini |
@@ -49,8 +53,17 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
   migration dan seed
 - Empat kumpulan fungsi akses data di `@/server/repositories`, masing-masing punya dua implementasi:
   data contoh (in-memory) dan Prisma. Ditukar lewat satu variabel di `.env.local`
-- Halaman: `/`, `/articles`, `/articles/[slug]`, `/about`, `/admin`
-- Alamat artikel yang salah menampilkan halaman "tidak ditemukan"
+- Halaman: `/`, `/articles`, `/articles/[slug]`, `/about`, `/admin` — semuanya menjawab `200` di
+  build produksi dengan `DATA_SOURCE=prisma` (uji asap HTTP, 18 Sep 2026)
+- Halaman publik mengambil data lewat `articleRepo`: halaman depan (`listFeatured`, `listPublished`,
+  `listPopular`), `/articles`, dan detail artikel (`findBySlug`)
+- Tombol "Muat Lebih Banyak" di halaman depan memuat 3 artikel berikutnya lewat Server Action
+  `src/app/actions/articles.ts` dan hilang sendiri saat artikel habis (`src/components/ArticleFeed.tsx`)
+- Membuka detail artikel menambah `viewCount` — dipakai daftar "artikel populer"
+- `/admin` (`src/app/admin/page.tsx` + `AdminArticlesClient.tsx` + `actions.ts`): tulis, edit,
+  simpan sebagai draft, terbitkan/tarik, dan hapus artikel — tersimpan ke database lewat
+  `articleAdminRepo`. Halaman admin menampilkan sumber data yang sedang aktif
+- Alamat artikel yang salah menampilkan halaman "tidak ditemukan" (`404`, dicek 18 Sep 2026)
 - Aturan tampil publik — draft, artikel terjadwal, dan artikel arsip tidak terlihat lewat alamat,
   daftar, maupun pencarian — diuji 12 pengecekan di `verify:all`, dan terbukti menangkap kerusakan
   lewat uji mutasi (11 September 2026)
@@ -59,14 +72,17 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
 
 | Hal | Bukti di kode |
 |---|---|
-| Halaman belum memakai database | `src/app/page.tsx`, `src/app/articles/[slug]/page.tsx`, dan komponen masih `import { articles } from "@/data/articles"` |
+| **Login & pemeriksaan sesi** | Tidak ada `proxy.ts`, tidak ada kode autentikasi. Kelima Server Action di `src/app/admin/actions.ts` — termasuk `deleteArticleAction` — tidak memeriksa sesi. Server Action bisa dipanggil langsung lewat HTTP, jadi mencabut tautan footer saja tidak cukup |
+| Validasi input | Belum ada Zod. `actions.ts` hanya memeriksa judul dan isi tidak kosong; kategori, penulis, dan alamat gambar diterima apa adanya |
+| Gambar dari alamat luar | Form admin menerima `https://...`, tapi `next.config.ts` belum punya `images.remotePatterns` — dari membaca kode, `next/image` akan menolak gambar itu saat artikelnya ditampilkan. **Belum dicoba di browser** |
+| Daftar penulis ditulis tangan | `src/app/admin/page.tsx` — `DEFAULT_AUTHORS` berisi 5 nama tetap, bukan diambil dari database |
 | Menu kategori buntu | `src/components/Navbar.tsx` — enam menu masih `href: "#"` |
 | Halaman kategori & pencarian | Belum ada berkasnya. Fungsi `articleRepo.listByCategory()` dan `.search()` sudah tersedia |
-| Tombol "Muat Lebih Banyak" | Ada di `src/app/page.tsx:36`, diklik tidak melakukan apa-apa |
+| `/articles` belum berhalaman | `src/app/articles/page.tsx` hanya menampilkan 10 artikel pertama |
+| Jadwal tayang | Form admin belum bisa memilih tanggal terbit; database sudah mendukung lewat `publishedAt` |
 | Newsletter | `src/components/NewsletterForm.tsx:10` hanya memanggil `alert()` |
-| Admin tidak menyimpan ke database | `src/app/admin/page.tsx` bertanda `"use client"` dan memakai `localStorage` |
 | Tampilan loading & error | Belum ada `loading.tsx` maupun `error.tsx` di mana pun |
-| Pengecekan otomatis | Tidak ada `.github/workflows/`; `npm run lint` masih 2 error sehingga CI akan langsung merah |
+| Pengecekan otomatis | Tidak ada `.github/workflows/`; `npm run lint` masih 1 error sehingga CI akan langsung merah |
 
 ---
 
@@ -77,8 +93,9 @@ Berlaku untuk anggota tim maupun AI agent. Melanggar satu saja bisa merusak kerj
 1. **Halaman tidak boleh menyentuh database langsung.** Jangan pernah `import` Prisma dari dalam
    `src/app/`. Semua akses data lewat `@/server/repositories`. Kalau fungsinya belum ada, minta
    dibuatkan — jangan menulis query sendiri.
-2. **`src/data/articles.ts` berstatus beku.** Masih dipakai beberapa halaman. Jangan diubah
-   bentuknya; kalau perlu bentuk baru, pakai penerjemah di `src/server/data/seed-source.ts`.
+2. **`src/data/articles.ts` berstatus beku.** Sejak PR #6 tidak ada halaman yang memakainya lagi —
+   satu-satunya pemakainya `src/server/data/seed-source.ts` (data awal dan mode `memory`). Jangan
+   diubah bentuknya; kalau perlu bentuk baru, ubah penerjemahnya di `seed-source.ts`.
 3. **`prisma/schema.prisma` tidak boleh diubah sendirian.** Kode orang lain dibangun di atas bentuk
    data itu. Bahas dulu.
 4. **`.env.local` tidak boleh di-commit.** Yang boleh ikut cuma `.env.example`.
@@ -101,9 +118,10 @@ src/server/db/           sambungan database               -> Orang 1
 src/server/repositories/ fungsi akses data (4 kumpulan)   -> Orang 1
 src/server/domain/       bentuk data                      -> Orang 1
 src/app/                 halaman
-  admin/                 halaman redaksi                  -> Orang 3
+  actions/               Server Action untuk halaman publik ("Muat Lebih Banyak")
+  admin/                 halaman redaksi + Server Action-nya -> Orang 3
 src/components/          komponen tampilan                -> Orang 2
-src/data/articles.ts     data contoh, BEKU
+src/data/articles.ts     data contoh, BEKU (hanya dipakai seed-source.ts)
 scripts/                 skrip verifikasi
 docs/                    dokumentasi tim
 .claude/                 konfigurasi Claude Code (ECC, profil minimal, tanpa hooks)
@@ -125,23 +143,26 @@ docs/                    dokumentasi tim
 Anggota organisasi ada 5: `kvnlhm`, `azridalimunthe7`, `fikarnugraha18`, `astroceilo`,
 `rizkikusnadi03`. Dua nama terakhir belum kebagian peran.
 
+PR #6 (menyambungkan halaman publik **dan** `/admin` ke repository) ditulis `kvnlhm` dan digabung
+`rizkikusnadi03`. PR itu menyentuh wilayah Orang 2 dan Orang 3 sekaligus.
+
 ---
 
 ## Perintah dan hasil terakhir
 
-Semuanya dijalankan ulang **11 September 2026**, setelah pengujian aturan tampil publik ditambahkan
-dan `.claude/` dikecualikan dari lint.
+Semuanya dijalankan ulang **18 September 2026** di commit `5a28131`, dengan `DATA_SOURCE=prisma`.
 
 | Perintah | Hasil terakhir |
 |---|---|
 | `npm run typecheck` | **PASS** |
-| `npm run build` | **PASS** — 6 halaman |
-| `npm run lint` | **2 error, 5 warning** — `src/components/Footer.tsx:21` dan `src/app/admin/page.tsx:23` |
+| `npm run build` | **PASS** — 6 halaman; `/` dan `/articles` dibangun statis, `/admin` dan detail artikel dinamis |
+| `npm run lint` | **FAIL — 1 error, 1 warning**, keduanya di `src/components/Footer.tsx` (`<a href="/">` di baris 21; `Link` di-import tapi tidak dipakai). Error di `admin/page.tsx` sudah hilang karena berkasnya ditulis ulang di PR #6 |
 | `npm run verify:repo` | **PASS** — 37 pengecekan, tidak butuh database |
 | `npm run verify:compare` | **PASS** — 20 sama, 0 beda |
-| `npm run verify:all` | **PASS** — 106 pengecekan, butuh database |
+| `npm run verify:all` | **PASS** — 106 pengecekan, butuh database; data ujinya dibersihkan sendiri |
+| Uji asap HTTP ke build produksi | **PASS** — `/`, `/articles`, detail artikel, `/about`, `/admin` → `200`; alamat salah → `404` |
 | `npm run db:migrate` / `db:seed` / `db:reset` | **NOT_RUN** sejak PR #3 masuk (terakhir PASS 5 Sep) |
-| Pemeriksaan manual di browser | **NOT_RUN** sejak PR #3 masuk |
+| Alur admin di browser (tulis → terbit → muncul di depan → hapus) | **NOT_RUN** — belum diklik di browser sungguhan. Server Action-nya belum punya pengujian otomatis |
 
 Menjalankan `verify:all` dan `verify:compare` butuh `.env.local` yang menunjuk ke database Neon.
 `verify:repo` tidak butuh database sama sekali.
@@ -152,11 +173,14 @@ Menjalankan `verify:all` dan `verify:compare` butuh `.env.local` yang menunjuk k
 
 Diurutkan dari yang paling berisiko. Daftar lengkap beserta alasannya ada di `docs/PRD.md` bagian 11.
 
-1. Proyek ini komersial atau bukan — Vercel paket gratis melarang pemakaian komersial
-2. Siapa Orang 4 dan Orang 5 — tanpa Orang 5, `main` tetap tidak terkunci
-3. `/admin` disambungkan ke database atau dibiarkan `localStorage` dulu
-4. Login harus jalan **sebelum** `/admin` menyentuh database, karena tautannya sudah publik di footer
-5. Editor boleh apa, Admin boleh apa
+1. **Kapan login dipasang, dan apa yang dilakukan sampai saat itu.** `/admin` sudah menulis ke
+   database tanpa login (PR #6). Selama belum ada login, situs tidak boleh di-deploy ke publik.
+   Pilihan sementara yang perlu diputuskan pemilik `/admin`: biarkan saja karena belum di-deploy,
+   atau matikan penulisan di luar mode pengembangan
+2. Proyek ini komersial atau bukan — Vercel paket gratis melarang pemakaian komersial
+3. Siapa Orang 4 dan Orang 5 — tanpa Orang 5, `main` tetap tidak terkunci. `rizkikusnadi03` sudah
+   mulai ikut (menggabungkan PR #6), tapi perannya belum ditetapkan
+4. Editor boleh apa, Admin boleh apa
 
 ---
 

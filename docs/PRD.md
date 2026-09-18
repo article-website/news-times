@@ -108,7 +108,8 @@ boleh apa belum diputuskan** — lihat bagian 11.
 
 ## 5. Kebutuhan fungsional
 
-Kolom **Sekarang** diisi berdasarkan kode di commit `f9f4ece`, bukan berdasarkan rencana.
+Kolom **Sekarang** diisi berdasarkan kode di commit `5a28131` (setelah PR #6, diperiksa 18 September
+2026), bukan berdasarkan rencana.
 
 Keterangan: ✅ jalan · 🟡 sebagian · ⬜ belum ada
 
@@ -116,12 +117,12 @@ Keterangan: ✅ jalan · 🟡 sebagian · ⬜ belum ada
 
 | ID | Kebutuhan | Sekarang | Catatan |
 |---|---|---|---|
-| P-01 | Halaman depan menampilkan artikel unggulan dan artikel terbaru | 🟡 | Jalan, tapi datanya masih dari `articles.ts` |
-| P-02 | Daftar artikel bisa dilanjutkan (paginasi / "Muat Lebih Banyak") | 🟡 | Tombolnya ada di `src/app/page.tsx:36` tapi belum melakukan apa-apa |
-| P-03 | Halaman detail artikel per alamat | 🟡 | Jalan, data masih dari `articles.ts` |
+| P-01 | Halaman depan menampilkan artikel unggulan dan artikel terbaru | ✅ | Lewat `articleRepo.listFeatured()` dan `.listPublished()` sejak PR #6 |
+| P-02 | Daftar artikel bisa dilanjutkan (paginasi / "Muat Lebih Banyak") | 🟡 | Halaman depan: jalan sejak PR #6 (`ArticleFeed.tsx`, 3 artikel per klik). `/articles`: masih berhenti di 10 artikel pertama |
+| P-03 | Halaman detail artikel per alamat | ✅ | Lewat `articleRepo.findBySlug()` sejak PR #6 |
 | P-04 | Halaman per kategori | ⬜ | Enam menu di `Navbar.tsx` semuanya masih `href="#"` |
 | P-05 | Pencarian artikel | ⬜ | Halamannya belum ada; fungsi `articleRepo.search()` sudah tersedia |
-| P-06 | Daftar artikel populer di sidebar | 🟡 | Memakai `viewCount`; sekarang dari data contoh |
+| P-06 | Daftar artikel populer di sidebar | ✅ | `articleRepo.listPopular()`; `viewCount` bertambah setiap detail artikel dibuka. Angkanya di halaman depan tidak langsung bergerak — lihat [ARSITEKTUR.md 8.5](./ARSITEKTUR.md#85-halaman-depan-dan-articles-dibangun-statis) |
 | P-07 | Berlangganan newsletter | 🟡 | Form ada, tapi `NewsletterForm.tsx:10` cuma memanggil `alert()` |
 | P-08 | Alamat artikel yang salah menampilkan halaman "tidak ditemukan" | ✅ | Sudah diuji |
 | P-09 | Tiap halaman punya tampilan loading dan error | ⬜ | Belum ada `loading.tsx` maupun `error.tsx` |
@@ -132,25 +133,25 @@ Keterangan: ✅ jalan · 🟡 sebagian · ⬜ belum ada
 | ID | Kebutuhan | Sekarang | Catatan |
 |---|---|---|---|
 | R-01 | Login dengan email dan password | ⬜ | Tabel `User` sudah siap, sistem loginnya belum dibuat |
-| R-02 | Semua halaman `/admin` terkunci untuk yang belum login | ⬜ | **Tautan "Redaksi (Admin)" sudah publik di footer** |
-| R-03 | Melihat daftar artikel termasuk draft | 🟡 | Ada di `/admin`, tapi datanya dari `localStorage` browser |
-| R-04 | Menulis dan mengedit artikel | 🟡 | Sama — belum tersimpan ke database |
-| R-05 | Memilih status draft atau terbit | ⬜ | Form sekarang selalu langsung menerbitkan |
+| R-02 | Semua halaman `/admin` terkunci untuk yang belum login | ⬜ | **Mendesak:** `/admin` sudah menulis ke database, dan tautannya publik di footer — lihat [KEAMANAN.md K-1](./KEAMANAN.md) |
+| R-03 | Melihat daftar artikel termasuk draft | ✅ | `articleAdminRepo.list()` sejak PR #6, maksimal 100 artikel tanpa halaman berikutnya |
+| R-04 | Menulis dan mengedit artikel | ✅ | Tersimpan ke database sejak PR #6. Validasinya baru "judul dan isi tidak kosong" (lihat S-06) |
+| R-05 | Memilih status draft atau terbit | ✅ | Tombol "Simpan sebagai Draft" dan terbitkan/tarik di tabel, sejak PR #6 |
 | R-06 | Menjadwalkan artikel tayang di tanggal tertentu | ⬜ | Database sudah mendukung lewat `publishedAt` |
-| R-07 | Menghapus artikel | 🟡 | Ada, masih di `localStorage` |
-| R-08 | Mengunggah gambar artikel | ⬜ | Rencananya ke Vercel Blob, bukan ke folder `public/` |
+| R-07 | Menghapus artikel | ✅ | Menghapus dari database sejak PR #6, dengan konfirmasi |
+| R-08 | Mengunggah gambar artikel | ⬜ | Rencananya ke Vercel Blob. Sementara form menerima **alamat** gambar; alamat dari domain luar kemungkinan ditolak `next/image` — lihat [ARSITEKTUR.md 8.6](./ARSITEKTUR.md#86-gambar-dari-alamat-luar) |
 | R-09 | Membuat admin pertama saat belum ada akun sama sekali | ⬜ | `userRepo.count()` sudah disediakan untuk mendeteksinya |
 
-> **Catatan penting soal R-03, R-04, dan R-07.** Halaman `/admin` sudah jadi dan tampilannya rapi,
-> tapi menyimpan data di `localStorage` — kotak penyimpanan milik browser. Artinya artikel yang
-> ditambah hanya terlihat di perangkat yang menambahkannya, dan tidak pernah muncul di halaman
-> depan. Menyambungkannya ke database tidak mengubah tampilan, hanya sumber datanya.
+> **Catatan penting soal R-03 sampai R-07.** Sejak PR #6 (17 Sep 2026), `/admin` menyimpan ke
+> database, jadi artikel yang ditulis di sana muncul di halaman depan. Tapi karena **R-01 dan R-02
+> belum ada**, fitur-fitur ini bisa dipakai siapa saja. Yang sudah ✅ baru boleh dianggap siap rilis
+> setelah login terpasang.
 
 ### Untuk sistem
 
 | ID | Kebutuhan | Sekarang | Catatan |
 |---|---|---|---|
-| S-01 | Data artikel tersimpan permanen | 🟡 | Database dan fungsi aksesnya siap; halaman belum memakainya |
+| S-01 | Data artikel tersimpan permanen | ✅ | Dengan `DATA_SOURCE=prisma`, halaman publik dan admin memakai database sejak PR #6. Mode `memory` tetap tidak permanen — hanya untuk pengembangan |
 | S-02 | Draft dan artikel terjadwal tidak bocor ke publik | ✅ | Ditegakkan di lapisan data, bukan di tiap halaman |
 | S-03 | Urutan artikel stabil antar halaman | ✅ | Memakai dua patokan urutan |
 | S-04 | `sitemap.xml`, `rss.xml`, `robots.txt` | ⬜ | Wajib berupa URL, karena yang membacanya mesin dari luar |
@@ -175,7 +176,7 @@ Delapan aturan ini sudah tertanam di kode. Mengubahnya berarti mengubah kode, ja
 | 5 | Tidak ada akun admin bawaan | Akun contoh dengan password mudah ditebak jadi pintu belakang kalau ikut terpasang di produksi |
 | 6 | Kategori tetap enam, walaupun dua di antaranya belum ada artikelnya | Kalau daftar kategori diambil dari artikel saja, menu Internasional dan Olahraga hilang sendiri |
 | 7 | Gambar tidak masuk git, disimpan di layanan penyimpanan | Folder `public/` sudah 18 MB, dan server produksi tidak bisa ditulisi |
-| 8 | `src/data/articles.ts` dibekukan — hanya jadi sumber data awal | Beberapa halaman masih memakainya; mengubah bentuknya akan merusak kerjaan orang lain |
+| 8 | `src/data/articles.ts` dibekukan — hanya jadi sumber data awal | Dulu beberapa halaman memakainya; mengubah bentuknya akan merusak kerjaan orang lain. Sejak PR #6 hanya `seed-source.ts` yang membacanya |
 
 ---
 
@@ -208,7 +209,7 @@ fungsi di `@/server/repositories` — cara memakainya ada di [DATABASE.md](./DAT
 | Keamanan | Password hanya disimpan sebagai hash; rahasia tidak pernah masuk repo | `.env.local` tidak boleh di-commit. Kode database dipagari supaya tidak ikut terkirim ke browser |
 | Aksesibilitas | Bisa dipakai dengan keyboard, kontras cukup, tiap gambar punya `alt` | Belum pernah diaudit |
 | Perangkat | 360px sampai desktop | Belum pernah dicek di HP sungguhan |
-| Kualitas kode | `typecheck`, `lint`, dan `build` bersih sebelum digabung | Saat ini `lint` masih 2 error, jadi pengecekan otomatis belum bisa dinyalakan |
+| Kualitas kode | `typecheck`, `lint`, dan `build` bersih sebelum digabung | Saat ini `lint` masih 1 error (per 18 Sep 2026), jadi pengecekan otomatis belum bisa dinyalakan |
 
 ---
 
@@ -250,8 +251,8 @@ Diurutkan dari yang paling berisiko kalau dibiarkan.
 |---|---|---|---|
 | 1 | Proyek ini komersial atau bukan? | Vercel paket gratis **melarang** pemakaian komersial. Kalau ternyata untuk perusahaan, anggaran hosting harus dibahas dari sekarang | Semua + pembimbing |
 | 2 | Siapa Orang 4 (Validasi & SEO) dan Orang 5 (Deploy & Testing)? | Tanpa Orang 5, tidak ada yang mengunci `main` dan memasang pengecekan otomatis | Semua |
-| 3 | Halaman `/admin` disambungkan ke database, atau dibiarkan `localStorage` dulu? | Selama masih `localStorage`, R-01 sampai R-09 tidak bisa dianggap selesai | Pemilik `/admin` + Orang 1 |
-| 4 | Login dipasang sebelum atau sesudah `/admin` menyentuh database? | Tautan Redaksi sudah publik di footer. Kalau urutannya terbalik, siapa pun bisa menghapus artikel | Pemilik `/admin` |
+| 3 | ~~Halaman `/admin` disambungkan ke database, atau dibiarkan `localStorage` dulu?~~ | **Sudah terjawab:** disambungkan di PR #6 | — |
+| 4 | ~~Login dipasang sebelum atau sesudah `/admin` menyentuh database?~~ **Sekarang:** apa yang dilakukan sampai login jadi? | Urutannya sudah terlanjur terbalik — `/admin` menulis ke database tanpa login. Pilihannya: tidak deploy sampai login jadi, dan/atau menolak penulisan di luar mode pengembangan | Pemilik `/admin` |
 | 5 | Editor boleh apa saja, Admin boleh apa saja? | Perannya sudah ada di database tapi belum berarti apa-apa | Semua |
 | 6 | Berapa artikel yang harus ada saat rilis? | Situs berita berisi 5 artikel tidak bisa dinilai. Rencana kerja menyebut 30–50 | Semua |
 | 7 | Repo ini public atau private? | Menentukan jatah menit GitHub Actions | Semua |
@@ -264,3 +265,4 @@ Diurutkan dari yang paling berisiko kalau dibiarkan.
 | Tanggal | Perubahan |
 |---|---|
 | 10 September 2026 | Draft pertama. Disusun dari kondisi kode di commit `f9f4ece` |
+| 18 September 2026 | Status kebutuhan diperbarui setelah PR #6: P-01, P-03, P-06, R-03, R-04, R-05, R-07, S-01 menjadi ✅; keputusan no. 3 terjawab, no. 4 berubah |

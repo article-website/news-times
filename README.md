@@ -7,9 +7,10 @@ Dikerjakan lima orang sebagai proyek magang. Satu aplikasi Next.js — tidak ada
 
 > **Kondisi terkini ada di [STATUS.md](./STATUS.md).** Baca itu dulu sebelum mengubah apa pun.
 >
-> Ringkasnya per 10 September 2026: lapisan datanya sudah selesai dan teruji, tapi **belum ada satu
-> halaman pun yang memakainya** — semua halaman masih membaca 5 artikel yang ditulis tangan di
-> `src/data/articles.ts`.
+> Ringkasnya per 18 September 2026: halaman publik dan `/admin` sudah memakai lapisan data (PR #6),
+> jadi artikel yang ditulis di admin tersimpan ke database dan muncul di halaman depan. **Tapi
+> `/admin` belum punya login** — siapa pun bisa mengubah dan menghapus artikel. Jangan deploy ke
+> publik sebelum login dipasang.
 
 ---
 
@@ -68,9 +69,9 @@ Kode halaman tidak perlu diubah sama sekali saat berpindah. Penjelasannya ada di
 
 Hasil terakhir semua perintah ini, lengkap dengan tanggalnya, ada di [STATUS.md](./STATUS.md).
 
-> Catatan jujur: `npm run lint` saat ini masih **2 error** (`src/components/Footer.tsx:21` dan
-> `src/app/admin/page.tsx:23`). Selama belum dibereskan, pengecekan otomatis belum bisa dinyalakan —
-> begitu dinyalakan, semua pull request akan langsung merah.
+> Catatan jujur: `npm run lint` saat ini masih **1 error** (`src/components/Footer.tsx:21`). Selama
+> belum dibereskan, pengecekan otomatis belum bisa dinyalakan — begitu dinyalakan, semua pull request
+> akan langsung merah.
 
 ---
 
@@ -80,10 +81,11 @@ Hasil terakhir semua perintah ini, lengkap dengan tanggalnya, ada di [STATUS.md]
 prisma/                   schema, migration, seed
 src/
   app/                    halaman
-    admin/                halaman redaksi
+    actions/              Server Action halaman publik ("Muat Lebih Banyak")
+    admin/                halaman redaksi + Server Action-nya
     articles/             daftar dan detail artikel
   components/             komponen tampilan
-  data/articles.ts        data contoh — BEKU, jangan diubah
+  data/articles.ts        data awal — BEKU, jangan diubah (hanya dibaca seed-source.ts)
   server/
     db/                   sambungan database
     domain/               bentuk data

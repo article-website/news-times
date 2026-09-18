@@ -27,11 +27,11 @@ ECC di `.claude/rules/ecc/`. Salinannya ada di `.agents/rules/newstimes.md`.
 
 | Fakta | Akibatnya kalau diabaikan |
 |---|---|
-| Semua halaman masih membaca `src/data/articles.ts`, **belum** memakai repository | Agent mengira data sudah datang dari database |
-| `src/app/admin/page.tsx` bertanda `"use client"` dan menyimpan ke `localStorage` | Agent mencoba memanggil repository dari sana — build akan gagal karena pagar `server-only` |
-| Belum ada login sama sekali, dan tautan `/admin` sudah publik di footer | Menyambungkan `/admin` ke database **sebelum** login dipasang membuka situs untuk dihapus siapa saja |
+| Sejak PR #6 halaman publik memakai `articleRepo`; `src/data/articles.ts` hanya dibaca `seed-source.ts` | Agent mengira halaman masih memakai data tulisan tangan dan "memperbaiki" yang sudah benar |
+| `/admin` = `page.tsx` (server) + `AdminArticlesClient.tsx` (`"use client"`) + `actions.ts` (`"use server"`) | Agent memanggil repository dari `AdminArticlesClient.tsx` — build gagal karena pagar `server-only`. Tulis lewat `actions.ts` |
+| Belum ada login, tapi `/admin` **sudah** menulis ke database dan tautannya publik di footer | Siapa pun bisa menghapus artikel. Jangan menganggap situs siap deploy; setiap Server Action penulis data wajib memeriksa sesi begitu login ada |
 | Next.js 16: `middleware.ts` sudah berganti nama jadi `proxy.ts` | Kode dari tutorial lama tidak berjalan |
-| `npm run lint` di `main` sudah 2 error sejak awal | Agent mengira perubahannya yang merusak |
+| `npm run lint` di `main` sudah 1 error (`Footer.tsx:21`) sebelum kamu mengubah apa pun | Agent mengira perubahannya yang merusak |
 
 ## 4. Kenali peta dan wilayah
 

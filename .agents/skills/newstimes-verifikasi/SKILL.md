@@ -44,14 +44,14 @@ yang valid, laporkan sebagai `NOT_RUN — tidak ada database`, bukan `FAIL`.
 
 ## Langkah 3 — Bandingkan dengan kondisi awal
 
-Beberapa hal **sudah gagal sebelum kamu mulai**. Per 11 September 2026:
+Beberapa hal **sudah gagal sebelum kamu mulai**. Per 18 September 2026 (commit `5a28131`):
 
 | Perintah | Kondisi awal di `main` |
 |---|---|
-| `npm run lint` | 2 error — `src/components/Footer.tsx:21` dan `src/app/admin/page.tsx:23` |
+| `npm run lint` | 1 error, 1 warning — keduanya di `src/components/Footer.tsx` (`<a href="/">` di baris 21; `Link` tidak dipakai) |
 
-Kalau hanya dua error itu yang muncul, perubahanmu tidak menambah masalah — laporkan apa adanya dan
-sebutkan bahwa keduanya bawaan. Kalau ada error **baru**, itu tanggung jawab perubahanmu.
+Kalau hanya error dan warning itu yang muncul, perubahanmu tidak menambah masalah — laporkan apa
+adanya dan sebutkan bahwa keduanya bawaan. Kalau ada error **baru**, itu tanggung jawab perubahanmu.
 
 Kondisi awal terbaru selalu ada di `STATUS.md`, tabel **Perintah dan hasil terakhir**.
 
@@ -61,7 +61,7 @@ Format di deskripsi PR atau laporan akhir:
 
 ```
 npm run typecheck      PASS
-npm run lint           FAIL — 2 error, keduanya sudah ada di main sebelum perubahan ini
+npm run lint           FAIL — 1 error, sudah ada di main sebelum perubahan ini
 npm run build          PASS — 6 halaman
 npm run verify:repo    PASS — 37
 npm run verify:all     NOT_RUN — tidak ada database di lingkungan ini

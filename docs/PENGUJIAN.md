@@ -1,6 +1,6 @@
 # Strategi Pengujian
 
-> **Diperbarui:** 11 September 2026 · kondisi `main` di commit `bdf88c4`
+> **Diperbarui:** 18 September 2026 · kondisi `main` di commit `5a28131` (setelah PR #6)
 >
 > Dokumen ini menjawab tiga pertanyaan: **apa yang sudah diuji, apa yang belum, dan apa yang harus
 > diuji lebih dulu.** Semua angka di sini berasal dari perintah yang benar-benar dijalankan.
@@ -44,7 +44,7 @@ Semuanya di folder `scripts/`, dijalankan lewat `npm run`.
 | `npm run verify:compare` | Hasil versi data contoh vs versi database, dibandingkan kolom per kolom | Ya | PASS — 20 sama, 0 beda |
 | `npm run verify:all` | `userRepo`, `newsletterRepo`, dan `articleAdminRepo` — rangkaian uji yang **sama** dijalankan ke kedua versi — ditambah **aturan tampil publik** dari sisi `articleRepo` (12 pengecekan, hanya Prisma) | Ya | PASS — 106 |
 
-Hasil terakhir dari 10 September 2026. Ada juga `npm run coba` — bukan pengujian, melainkan ruang
+Hasil terakhir dari 18 September 2026, di commit `5a28131`. Ada juga `npm run coba` — bukan pengujian, melainkan ruang
 percobaan untuk memanggil fungsi secara langsung.
 
 ### Pengecekan dasar yang juga dijalankan
@@ -52,8 +52,9 @@ percobaan untuk memanggil fungsi secara langsung.
 | Perintah | Yang diperiksa | Hasil terakhir |
 |---|---|---|
 | `npm run typecheck` | Kesalahan tipe data di seluruh kode | PASS |
-| `npm run lint` | Gaya kode dan pola yang berisiko | **2 error, 5 warning** |
+| `npm run lint` | Gaya kode dan pola yang berisiko | **FAIL — 1 error, 1 warning**, keduanya di `src/components/Footer.tsx` |
 | `npm run build` | Seluruh situs bisa dibangun untuk produksi | PASS — 6 halaman |
+| Uji asap HTTP ke build produksi (`next start`) | Setiap halaman menjawab, alamat salah menjawab 404 | PASS — 5 halaman `200`, alamat salah `404` (dijalankan manual dengan `curl`, belum jadi skrip) |
 
 ---
 
@@ -71,16 +72,27 @@ kontrol positif — tanpa itu, fungsi yang rusak dan selalu mengembalikan kosong
 
 Riwayat lengkapnya di [KEAMANAN.md temuan K-9](./KEAMANAN.md#k-9--aturan-terpenting-justru-tidak-teruji).
 
-### 3.2 Tampilan tidak diuji sama sekali
+### 3.2 Tampilan dan Server Action tidak diuji otomatis
 
 Tidak ada pengujian yang membuka halaman lalu memeriksa isinya. Semua pengecekan di atas menguji
 lapisan data. Artinya kerusakan di halaman — tautan buntu, tampilan error, tombol tidak berfungsi —
 hanya ketahuan kalau dibuka manual.
 
+Sejak PR #6 celah ini lebih berarti, karena ada logika baru **di luar** lapisan data yang tidak
+diuji siapa pun:
+
+- `src/app/admin/actions.ts` — pembuatan slug (`toSlug`), penanganan slug bentrok, nilai bawaan
+  kategori dan penulis, peralihan draft ↔ terbit saat edit
+- `src/components/ArticleFeed.tsx` — "Muat Lebih Banyak" menambah halaman dengan benar dan tombolnya
+  hilang saat habis
+
+Alur admin (tulis → terbit → muncul di depan → hapus) juga belum pernah diklik di browser: **NOT_RUN**.
+
 ### 3.3 Tidak ada yang memaksa pengecekan dijalankan
 
 Tanpa pengecekan otomatis di GitHub, sebuah PR bisa digabung tanpa satu pun perintah di atas
-dijalankan. Itu yang terjadi pada dua error lint yang sekarang ada di `main`.
+dijalankan. Itu yang terjadi pada error lint yang sekarang ada di `main`, dan pada PR #6 yang
+digabung tanpa review.
 
 ---
 
@@ -105,15 +117,16 @@ membocorkan data** — urutannya di bagian berikut. Angka cakupan tidak dijadika
 | Prioritas | Yang diuji | Kenapa | Jenis | Status |
 |---|---|---|---|---|
 | **1** | Draft dan artikel terjadwal tidak terlihat publik | Kalau rusak, isi yang belum boleh terbit bocor | Pengecekan lapisan data | ✅ `verify:all` — 12 pengecekan, lolos uji mutasi |
-| **2** | Halaman redaksi menolak yang belum login, dan Server Action menolak tanpa sesi | Kalau rusak, siapa pun bisa menghapus artikel | Pengecekan sisi server | ❌ Login belum ada |
+| **2** | Halaman redaksi menolak yang belum login, dan Server Action menolak tanpa sesi | Sejak PR #6 ini **bukan lagi kemungkinan**: tanpa login, siapa pun bisa menghapus artikel di database | Pengecekan sisi server | ❌ Login belum ada — **paling mendesak** |
 | **3** | Validasi input menolak isian yang tidak sah | Batas pertama sebelum data masuk database | Pengujian unit — murah dan cepat | ❌ Validasi belum ada |
-| **4** | Alur utuh: login → tulis → terbitkan → muncul di halaman depan | Ini kriteria selesai nomor 1 di [PRD](./PRD.md#10-kriteria-selesai) | Pengujian alur di browser | ❌ |
+| **4** | Alur utuh: login → tulis → terbitkan → muncul di halaman depan | Ini kriteria selesai nomor 1 di [PRD](./PRD.md#10-kriteria-selesai) | Pengujian alur di browser | ❌ Bagian "tulis → terbitkan → muncul" sudah bisa diuji sejak PR #6, tapi belum pernah |
+| **4a** | Pembuatan slug di `admin/actions.ts`: huruf beraksen, judul tanpa huruf, slug bentrok | Kalau rusak, alamat artikel bentrok atau kosong | Pengujian unit — murah | ❌ Belum ada. Sebaiknya dipindah ke `src/server/services/` dulu supaya mudah diuji |
 | **5** | Urutan, pembagian halaman, pencarian | Kalau rusak, artikel hilang atau ganda | Pengecekan lapisan data | ✅ `verify:repo` |
 | **6** | Kedua versi repository berperilaku sama | Kalau berbeda, halaman rusak saat pindah ke database | Perbandingan | ✅ `verify:compare`, `verify:all` |
 | **7** | Tampilan loading, error, dan kosong | Pengalaman pengguna saat ada masalah | Pemeriksaan manual dulu | ❌ Berkasnya belum ada |
 
-**Prioritas 1 sudah selesai.** Prioritas 2 dan 3 baru bisa dikerjakan setelah login dan validasi
-input dibuat — keduanya sebaiknya ditulis bersamaan dengan fiturnya, bukan belakangan.
+**Prioritas 1 sudah selesai.** Prioritas 2 sekarang yang paling mendesak. Prioritas 2 dan 3 baru bisa
+dikerjakan setelah login dan validasi input dibuat — keduanya sebaiknya ditulis bersamaan dengan fiturnya, bukan belakangan.
 
 ---
 
@@ -129,7 +142,8 @@ Sesuai [RENCANA-KERJA.md](./RENCANA-KERJA.md), dipasang oleh Orang 5:
 
 ### Urutan menyalakan pengecekan otomatis
 
-1. **Bereskan dua error lint dulu** — `src/components/Footer.tsx:21` dan `src/app/admin/page.tsx:23`.
+1. **Bereskan error lint dulu** — tinggal satu, di `src/components/Footer.tsx:21` (error di
+   `admin/page.tsx` hilang saat berkas itu ditulis ulang di PR #6).
    Kalau belum, semua PR langsung merah, termasuk yang isinya benar
 2. Nyalakan pengecekan: `npm ci && npm run typecheck && npm run lint && npm run build && npm run verify:repo`
 3. Kunci branch `main`: wajib PR, wajib satu review, wajib pengecekan hijau
@@ -163,6 +177,7 @@ Tambahan sesuai jenis perubahan:
 | Berkas di `src/server/repositories/` | `npm run verify:compare` dan `npm run verify:all` (butuh database) |
 | `prisma/schema.prisma` | `npm run db:migrate`, lalu `npm run verify:all` |
 | Halaman atau komponen | Buka halamannya di browser: di laptop, dan di HP |
+| Server Action (`src/app/**/actions.ts`) | Coba alurnya di browser dengan `DATA_SOURCE=prisma`, lalu pastikan hasilnya muncul di halaman publik |
 | Apa pun yang menyentuh login atau input | Baca [KEAMANAN.md bagian 5](./KEAMANAN.md#5-aturan-keamanan-untuk-setiap-anggota) |
 
 ---

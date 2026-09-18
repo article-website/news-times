@@ -509,7 +509,11 @@ Satu baris itu memindahkan **seluruh berkas** ke browser pengunjung.
 
 ### Contoh nyata di proyek kita
 
-Halaman `/admin` diberi tanda `"use client"` di baris pertama. Karena itu, halaman tersebut
+> **Catatan 18 September 2026:** masalah di bawah ini **sudah dibetulkan** di PR #6, persis dengan
+> cara yang dijelaskan di "Cara membetulkannya". Ceritanya dibiarkan karena masih jadi contoh yang
+> bagus untuk memahami batas server dan browser.
+
+Dulu, halaman `/admin` diberi tanda `"use client"` di baris pertama. Karena itu, halaman tersebut
 **tidak bisa** memanggil `articleAdminRepo` — fungsi itu ada di server, dan sengaja dipagari
 dengan `import "server-only"` supaya kalau ada yang mencoba memakainya di browser, prosesnya
 langsung gagal dengan pesan yang jelas.
@@ -532,6 +536,18 @@ Yang perlu dipindah bukan fungsinya, tapi **batas antara bagian server dan bagia
 - Hanya form-nya yang `"use client"`, supaya tombolnya tetap bisa diklik
 - Penyimpanan lewat **Server Action** — fitur Next.js yang membuat form bisa mengirim data ke
   server tanpa kita perlu membuat alamat URL sendiri
+
+Sekarang bentuknya memang begitu:
+
+| Berkas | Berjalan di | Tugasnya |
+|---|---|---|
+| `src/app/admin/page.tsx` | Server | Mengambil daftar artikel dan kategori dari database |
+| `src/app/admin/AdminArticlesClient.tsx` | Browser (`"use client"`) | Form dan tabel yang bisa diklik |
+| `src/app/admin/actions.ts` | Server (`"use server"`) | Menyimpan, mengubah, menerbitkan, dan menghapus lewat `articleAdminRepo` |
+
+Satu hal yang **belum** ada di `actions.ts`: pemeriksaan "yang meminta ini sudah login atau belum?"
+Server Action bisa dipanggil siapa saja yang tahu caranya, bahkan tanpa membuka halaman `/admin`.
+Karena itu pemeriksaan login nanti harus ditaruh **di dalam** setiap fungsinya.
 
 ---
 
@@ -785,23 +801,27 @@ Kondisi ini bisa berubah. Yang paling mutakhir selalu ada di [STATUS.md](../STAT
 - Lima tabel database beserta rancangan, riwayat perubahan, dan data awalnya
 - Empat kumpulan fungsi pengambil data, masing-masing punya dua versi
 - Halaman depan, daftar artikel, detail artikel, tentang kami, dan halaman redaksi
+- **Halaman-halaman itu sudah mengambil data dari database** (sejak PR #6, 17 Sep 2026)
+- Tombol "Muat Lebih Banyak" di halaman depan
+- Halaman redaksi menulis, mengedit, menerbitkan, dan menghapus artikel **di database** — artikel
+  yang diterbitkan langsung muncul di halaman depan
 - 163 pengecekan otomatis, semuanya lulus
 
 ### Belum jalan
 
 | Hal | Kondisinya |
 |---|---|
-| Halaman belum memakai database | Masih membaca 5 artikel dari dalam kode |
 | Menu kategori | Keenam menunya belum mengarah ke mana-mana |
 | Pencarian dan halaman kategori | Belum dibuat |
 | Newsletter | Tombolnya cuma memunculkan pesan, emailnya tidak disimpan |
-| Halaman redaksi | Menyimpan ke browser, bukan ke database |
-| Login | Belum ada sama sekali |
+| Login | Belum ada sama sekali — **dan ini sekarang mendesak**, karena halaman redaksi sudah bisa menghapus isi database |
+| Isian form diperiksa | Baru "judul dan isi tidak boleh kosong" |
 | Situs online | Belum pernah di-deploy |
 
 ### Kalimat yang paling jujur untuk menggambarkan posisi sekarang
 
-> Fondasinya sudah berdiri dan terbukti kuat. Yang tersisa adalah menyambungkannya ke tampilan.
+> Fondasinya sudah berdiri dan sudah tersambung ke tampilan. Yang paling mendesak sekarang adalah
+> mengunci pintunya: login, sebelum situs dibuka untuk umum.
 
 ---
 

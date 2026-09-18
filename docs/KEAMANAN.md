@@ -1,6 +1,8 @@
 # Keamanan NewsTimes
 
 > **Hasil audit:** 11 September 2026 · kondisi `main` di commit `bdf88c4`
+> **Diperbarui:** 18 September 2026 · kondisi `main` di commit `5a28131` (setelah PR #6) — K-1 naik
+> menjadi **kritis**, K-3 dan K-8 diperbarui. Perintah di bagian 9 dijalankan ulang, hasilnya sama.
 >
 > Dokumen ini berisi **temuan dari pemeriksaan sungguhan**, bukan daftar saran umum. Setiap temuan
 > menyebutkan buktinya dan cara mengulangi pemeriksaannya (lihat [bagian 9](#9-cara-mengulang-audit-ini)).
@@ -31,14 +33,16 @@
 tampilan artikel, tidak ada satu pun rahasia yang pernah masuk ke riwayat git, dan kode database
 dipagari supaya tidak bisa terbawa ke browser.
 
-**Yang perlu diwaspadai:** risiko terbesar belum terjadi, tapi **tinggal satu langkah lagi**.
+**Yang perlu diwaspadai:** risiko terbesar yang diperingatkan audit 11 September **sudah terjadi**.
 
-> Halaman `/admin` tidak punya login, dan tautannya sudah terpasang di footer setiap halaman.
-> Sekarang dampaknya terbatas karena halaman itu hanya menulis ke browser masing-masing. **Begitu
-> disambungkan ke database sebelum login dipasang, siapa pun yang membuka situs bisa mengubah dan
-> menghapus artikel.**
+> Audit sebelumnya menulis: "Begitu `/admin` disambungkan ke database sebelum login dipasang, siapa
+> pun yang membuka situs bisa mengubah dan menghapus artikel." PR #6 (digabung 17 Sep 2026)
+> menyambungkan `/admin` ke database, dan login belum ada. **Sekarang siapa pun yang bisa membuka
+> situs bisa menulis, menerbitkan, dan menghapus artikel di database.**
 
-Urutan yang aman: **login dulu, baru sambungkan ke database.** Tidak boleh terbalik.
+Dampaknya masih terbatas karena situs **belum pernah di-deploy** — yang bisa membukanya hanya orang
+yang menjalankan `npm run dev` di komputernya sendiri. Aturannya sekarang: **jangan deploy ke publik
+sebelum login dan pemeriksaan sesi di setiap Server Action terpasang.**
 
 ---
 
@@ -46,15 +50,15 @@ Urutan yang aman: **login dulu, baru sambungkan ke database.** Tidak boleh terba
 
 | # | Tingkat | Temuan | Bukti | Pemilik |
 |---|---|---|---|---|
-| **K-1** | **Tinggi** → jadi **kritis** kalau urutan kerja salah | Halaman redaksi tidak terkunci, dan tautannya publik | `src/app/admin/page.tsx` tanpa pemeriksaan sesi; tautan "Redaksi (Admin)" di `src/components/Footer.tsx`; tidak ada `proxy.ts` | Orang 3 |
+| **K-1** | **Kritis** (sejak PR #6) | Halaman redaksi dan Server Action-nya tidak terkunci, sudah menulis ke database, dan tautannya publik | `src/app/admin/page.tsx` dan kelima fungsi di `src/app/admin/actions.ts` tanpa pemeriksaan sesi; tautan "Redaksi (Admin)" di `src/components/Footer.tsx`; tidak ada `proxy.ts` | Orang 3 |
 | **K-2** | Sedang | Belum ada sistem login sama sekali | Tabel `User` ada, tapi tidak ada kode autentikasi di `src/` | Orang 3 |
-| **K-3** | Sedang | Belum ada validasi input di batas sistem | Tidak ada Zod maupun `src/lib/validation/`. Halaman admin menerima isian form apa adanya | Orang 4 |
+| **K-3** | Sedang | Belum ada validasi input di batas sistem | Tidak ada Zod maupun `src/lib/validation/`. `src/app/admin/actions.ts` hanya memeriksa judul dan isi tidak kosong; panjang teks, kategori, penulis, status, dan alamat gambar diterima apa adanya | Orang 4 |
 | **K-4** | Sedang | Newsletter tanpa pembatas spam | Belum ada pembatasan permintaan. Saat ini belum berdampak karena formnya belum menyimpan apa pun | Orang 4 |
 | **K-9** | **Ditutup** | Aturan "draft tidak bocor" tidak punya pengujian — **sudah diuji sejak 11 Sep 2026** | 12 pengecekan di `verify:all`, lolos uji mutasi | Orang 1 |
 | **K-5** | Rendah | 4 kerentanan **high** di dependensi | `npm audit --omit=dev` — lihat [rincian](#k-5--rincian-kerentanan-dependensi) | Orang 1 |
 | **K-6** | Rendah | Belum ada header keamanan (CSP, perlindungan *clickjacking*) | `next.config.ts` hanya berisi `reactCompiler: true` | Orang 5 |
-| **K-7** | Rendah | Proses kerja tanpa penjaga: `main` tidak dikunci, PR digabung tanpa review | PR #2 dan PR #3: 0 review. Tidak ada `.github/workflows/` | Orang 5 |
-| **K-8** | Info | Jumlah dibaca akan bisa digelembungkan | `incrementViewCount()` belum dipanggil halaman mana pun; begitu disambungkan, refresh berulang menaikkan angkanya | Orang 1 |
+| **K-7** | Rendah | Proses kerja tanpa penjaga: `main` tidak dikunci, PR digabung tanpa review | PR #2, #3, dan #6: 0 review. PR #6 membuka K-1 tanpa ada yang menahan. Tidak ada `.github/workflows/` | Orang 5 |
+| **K-8** | Info | Jumlah dibaca bisa digelembungkan | Sejak PR #6, `src/app/articles/[slug]/page.tsx` memanggil `incrementViewCount()` setiap kali dibuka; refresh berulang menaikkan angkanya | Orang 1 |
 
 ### K-1 — kenapa ini yang paling penting
 
@@ -62,10 +66,15 @@ Ada tiga hal yang kalau digabungkan jadi berbahaya:
 
 1. `/admin` bisa dibuka siapa saja
 2. Semua orang tahu alamatnya, karena ada di footer
-3. Rencana berikutnya adalah menyambungkan halaman itu ke database
+3. ~~Rencana berikutnya adalah menyambungkan halaman itu ke database~~ — **sudah terjadi di PR #6**
 
 Masing-masing sendiri belum berbahaya. **Ketiganya bersama-sama berarti siapa pun bisa menghapus
-seluruh isi situs.**
+seluruh isi situs** — dan per 18 September 2026 ketiganya sudah terpenuhi.
+
+**Kenapa mencabut tautan atau mengunci halaman saja tidak cukup:** Server Action seperti
+`deleteArticleAction` adalah pintu HTTP tersendiri. Orang yang tahu caranya bisa memanggilnya
+langsung tanpa pernah membuka `/admin`. Selain itu `getArticleDetailAction` mengembalikan isi
+lengkap artikel **termasuk draft** kepada siapa pun yang memanggilnya.
 
 **Cara mengamankannya yang benar di Next.js 16:**
 
@@ -78,9 +87,13 @@ seluruh isi situs.**
 Sumber: `node_modules/next/dist/docs/01-app/01-getting-started/16-proxy.md` dan
 `node_modules/next/dist/docs/01-app/02-guides/authentication.md`.
 
-**Langkah sementara yang murah**, kalau login masih lama: cabut dulu tautan "Redaksi (Admin)" dari
-footer. Ini tidak mengamankan apa pun — alamatnya tetap bisa ditebak — tapi setidaknya tidak
-mengiklankannya.
+**Langkah sementara**, kalau login masih lama — perlu diputuskan pemilik `/admin`:
+
+- Cabut tautan "Redaksi (Admin)" dari footer. Ini tidak mengamankan apa pun — alamatnya tetap bisa
+  ditebak dan Server Action tetap bisa dipanggil — tapi setidaknya tidak mengiklankannya
+- Yang benar-benar menahan: di awal setiap fungsi `admin/actions.ts`, tolak permintaan kalau
+  aplikasi tidak berjalan dalam mode pengembangan. Dengan begitu, deploy yang tidak sengaja pun
+  tidak membuka penulisan data. Dicabut lagi begitu pemeriksaan sesi terpasang
 
 ### K-9 — aturan terpenting justru tidak teruji
 
@@ -159,7 +172,8 @@ paling mendesak.
 | Siapa | Yang dia coba | Pertahanan sekarang | Status |
 |---|---|---|---|
 | Pengunjung iseng | Menebak alamat artikel draft | Aturan tampil publik di lapisan data, sudah diuji | ✅ |
-| Pengunjung iseng | Membuka `/admin` lalu menghapus artikel | Tidak ada | ❌ **K-1** |
+| Pengunjung iseng | Membuka `/admin` lalu menghapus artikel | Tidak ada — dan sejak PR #6 penghapusannya permanen di database | ❌ **K-1** |
+| Penyerang | Memanggil Server Action admin langsung, tanpa membuka halaman | Tidak ada | ❌ **K-1** |
 | Pengunjung iseng | Menyisipkan skrip lewat isi artikel | React meng-*escape* keluaran | ✅ |
 | Penyerang | Injeksi SQL lewat kolom pencarian | Query lewat Prisma | ✅ |
 | Bot spam | Membanjiri form newsletter | Tidak ada | ❌ **K-4** |
@@ -210,12 +224,12 @@ menyimpan hasilnya.
 
 Semua baris harus **PASS**. Yang belum dicek ditulis `NOT_RUN`, bukan dianggap lulus.
 
-| # | Syarat | Status per 11 Sep 2026 |
+| # | Syarat | Status per 18 Sep 2026 |
 |---|---|---|
 | 1 | Login berjalan, dan password disimpan sebagai hash | FAIL — belum ada |
 | 2 | Semua halaman `/admin` mengalihkan pengunjung yang belum login | FAIL — belum ada |
-| 3 | Setiap Server Action penulis data memeriksa sesi sendiri | FAIL — belum ada |
-| 4 | Setiap input dari luar divalidasi | FAIL — belum ada |
+| 3 | Setiap Server Action penulis data memeriksa sesi sendiri | FAIL — `src/app/admin/actions.ts` punya 5 fungsi, tidak satu pun memeriksa sesi |
+| 4 | Setiap input dari luar divalidasi | FAIL — hanya pemeriksaan "tidak kosong" untuk judul dan isi |
 | 4a | Aturan "draft tidak bocor" diuji otomatis | **PASS** — 12 pengecekan di `verify:all` |
 | 5 | `DATA_SOURCE=prisma` di setelan produksi | NOT_RUN — belum deploy |
 | 6 | Database produksi terpisah dari database pengembangan | NOT_RUN — belum deploy |

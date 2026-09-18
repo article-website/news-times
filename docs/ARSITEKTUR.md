@@ -1,6 +1,6 @@
 # Arsitektur NewsTimes
 
-> **Diperbarui:** 11 September 2026 · kondisi `main` di commit `bdf88c4`
+> **Diperbarui:** 18 September 2026 · kondisi `main` di commit `5a28131` (setelah PR #6)
 >
 > Dokumen ini menjelaskan **bentuk sistemnya**: lapisan apa saja, siapa boleh bergantung pada siapa,
 > keputusan apa yang sudah diambil beserta alasannya, dan di mana kode baru harus diletakkan.
@@ -53,7 +53,8 @@ Aturan itu **ditaati** di kode sekarang: tidak ada satu berkas pun di `src/app/`
                                      │  src/server/repositories/   [server-only]     │
                                      │        │                                      │
                                      │        ├── DATA_SOURCE=memory                 │
-                                     │        │     └─► src/data/articles.ts (beku)  │
+                                     │        │     └─► seed-source.ts               │
+                                     │        │           └─► data/articles.ts (beku)│
                                      │        │                                      │
                                      │        └── DATA_SOURCE=prisma                 │
                                      │              └─► src/server/db/client.ts      │
@@ -93,7 +94,7 @@ bukan mengambil sendiri. Contoh: halaman depan mengambil artikel, lalu memberika
 grep -rn "generated/prisma\|server/db\|@prisma/client" src/app src/components
 ```
 
-Hasil yang benar: **kosong**. Per 11 September 2026: kosong.
+Hasil yang benar: **kosong**. Per 18 September 2026 (setelah PR #6): kosong.
 
 ---
 
@@ -109,7 +110,23 @@ pertamanya `"use client"` — dan semua yang ia import ikut terbawa ke browser.
 | `src/components/Navbar.tsx` | `usePathname()` untuk menandai menu yang sedang aktif |
 | `src/components/HeroFeatured.tsx` | Slider artikel unggulan: `useState` dan tombol maju/mundur |
 | `src/components/NewsletterForm.tsx` | `useState` dan `onSubmit` untuk form email |
-| `src/app/admin/page.tsx` | **Seluruh halaman** — lihat [bagian 7](#7-arsitektur-sekarang-vs-arsitektur-tujuan) |
+| `src/components/ArticleFeed.tsx` | Tombol "Muat Lebih Banyak": menyimpan daftar yang sudah dimuat dan memanggil Server Action |
+| `src/app/admin/AdminArticlesClient.tsx` | Form dan tabel redaksi. Halamannya sendiri (`admin/page.tsx`) tetap di server |
+
+### Server Action
+
+Berkas bertanda `"use server"` berisi fungsi yang **dipanggil dari browser tapi dijalankan di
+server**. Dari sanalah repository boleh dipanggil untuk menulis data.
+
+| Berkas | Fungsi | Dipakai oleh |
+|---|---|---|
+| `src/app/actions/articles.ts` | `loadMoreArticles(page)` — hanya membaca, lewat `articleRepo` | `ArticleFeed.tsx` |
+| `src/app/admin/actions.ts` | `createArticleAction`, `updateArticleAction`, `deleteArticleAction`, `togglePublishAction`, `getArticleDetailAction` — lewat `articleAdminRepo` | `AdminArticlesClient.tsx` |
+
+> **Penting:** setiap Server Action adalah pintu yang bisa diketuk langsung lewat HTTP, tanpa
+> membuka halamannya. Jadi pemeriksaan login harus ada **di dalam fungsinya**, bukan hanya di
+> halaman. Per 18 September 2026 kelima fungsi di `admin/actions.ts` belum memeriksa apa pun —
+> lihat [KEAMANAN.md](./KEAMANAN.md) K-1.
 
 ### Pagar pengaman `server-only`
 
@@ -169,7 +186,7 @@ jadi **bahas dulu dengan tim**.
 | A-07 | **Prisma 7 dengan driver adapter**; alamat untuk migrasi di `prisma.config.ts`, dan migrasi memakai sambungan *unpooled* bila tersedia | Wajib di Prisma 7; perintah pengubah tabel kurang cocok lewat pooler | Ada dua tempat alamat database dibaca: aplikasi dan CLI |
 | A-08 | **Server Action, bukan API buatan tangan** — URL hanya untuk yang dibaca mesin luar (`sitemap.xml`, `rss.xml`, `robots.txt`) | Form di monolith tidak perlu keluar-masuk jaringan | Kalau kelak ada aplikasi lain yang butuh data, API harus dibuat saat itu |
 | A-09 | **Gambar ke layanan penyimpanan, bukan `public/`** (rencana: Vercel Blob) | `public/` sudah 18 MB; server produksi tidak bisa ditulisi | Butuh token layanan penyimpanan |
-| A-10 | **`src/data/articles.ts` dibekukan**; data lama diterjemahkan lewat `src/server/data/seed-source.ts` | Beberapa halaman masih memakainya; mengubah bentuknya merusak kerjaan orang lain | Selama transisi ada dua bentuk data artikel yang hidup berdampingan |
+| A-10 | **`src/data/articles.ts` dibekukan**; data lama diterjemahkan lewat `src/server/data/seed-source.ts` | Dulu beberapa halaman memakainya; mengubah bentuknya merusak kerjaan orang lain | Sejak PR #6 tidak ada halaman yang memakainya lagi — tinggal jadi sumber data awal untuk seed dan mode `memory` |
 | A-11 | **`DATA_SOURCE` bawaannya `memory` dan gagal keras kalau salah ketik** | Orang baru bisa langsung `npm run dev`; produksi tidak diam-diam memakai data contoh | Produksi **wajib** mengisi `DATA_SOURCE=prisma` secara eksplisit |
 
 ---
@@ -180,31 +197,34 @@ Bagian ini paling penting untuk dipahami, karena di sinilah jarak antara rancang
 
 | Bagian | Sekarang | Tujuan | Pemilik |
 |---|---|---|---|
-| Halaman publik | Membaca langsung `src/data/articles.ts` | Memanggil `articleRepo` | Orang 2 |
-| Halaman admin | Satu berkas `"use client"`, data di `localStorage` browser | Halaman server + form client + Server Action + `articleAdminRepo` | Orang 3 |
+| Halaman publik | ✅ **Sudah sesuai tujuan** (PR #6) — memanggil `articleRepo` | Memanggil `articleRepo` | Orang 2 |
+| Halaman admin | ✅ **Bentuknya sudah sesuai tujuan** (PR #6) — halaman server + form client + Server Action + `articleAdminRepo`. Yang belum: pemeriksaan sesi dan validasi di dalam Server Action | Halaman server + form client + Server Action + `articleAdminRepo` | Orang 3 |
 | Login | Tidak ada | Auth.js, sesi di cookie `httpOnly` | Orang 3 |
-| Penguncian `/admin` | Tidak ada, tautannya publik di footer | `proxy.ts` untuk pengalihan cepat, **ditambah** pemeriksaan sesi di sisi server sebelum setiap penulisan data | Orang 3 |
-| Aturan bisnis | Belum ada lapisannya | `src/server/services/` (pembuatan slug, aturan terbit) | Orang 4 |
-| Validasi input | Tidak ada | Skema Zod di `src/lib/validation/`, dipakai di setiap Server Action | Orang 4 |
+| Penguncian `/admin` | Tidak ada, tautannya publik di footer — **dan sekarang sudah menulis ke database** | `proxy.ts` untuk pengalihan cepat, **ditambah** pemeriksaan sesi di sisi server sebelum setiap penulisan data | Orang 3 |
+| Aturan bisnis | Belum ada lapisannya. Pembuatan slug ditulis langsung di `src/app/admin/actions.ts` (`toSlug`) | `src/server/services/` (pembuatan slug, aturan terbit) | Orang 4 |
+| Validasi input | Hanya "judul dan isi tidak kosong" di `admin/actions.ts` | Skema Zod di `src/lib/validation/`, dipakai di setiap Server Action | Orang 4 |
 | Gambar | `public/` | Vercel Blob | Orang 3 |
 
-### Kenapa halaman admin perlu disusun ulang, bukan sekadar "ditambah fungsi"
+### Halaman admin sudah disusun ulang — tinggal dua lapis pengaman
 
-Baris `"use client"` di `src/app/admin/page.tsx` memindahkan seluruh halaman ke browser. Dari sana,
-`articleAdminRepo` **tidak mungkin** dipanggil — pagar `server-only` akan menggagalkan build. Jadi yang
-perlu dipindah adalah **batasnya**:
+Dulu baris `"use client"` di `src/app/admin/page.tsx` memindahkan seluruh halaman ke browser, dan
+datanya disimpan di `localStorage`. PR #6 memindahkan **batasnya** sesuai rancangan: halaman kembali
+ke server, hanya form dan tabelnya yang di browser.
 
 ```
-Sekarang                          Tujuan
-────────────────────────          ─────────────────────────────────────
+Sebelum PR #6                     Sekarang (sejak PR #6)
+────────────────────────          ─────────────────────────────────────────
 admin/page.tsx  "use client"      admin/page.tsx            (server)
   ├─ useState                       ├─ ambil data: articleAdminRepo.list()
-  ├─ localStorage                   └─ <FormArtikel />      "use client"
-  └─ form                                 └─ kirim ke Server Action
-                                               ├─ periksa sesi login
-                                               ├─ validasi Zod
-                                               └─ articleAdminRepo.create()
+  ├─ localStorage                   └─ <AdminArticlesClient /> "use client"
+  └─ form                                 └─ kirim ke admin/actions.ts
+                                               ├─ periksa sesi login   ❌ belum
+                                               ├─ validasi Zod         ❌ belum
+                                               └─ articleAdminRepo.create()  ✅
 ```
+
+Dua kotak yang masih ❌ itulah pekerjaan berikutnya. Keduanya ditambahkan **di dalam** fungsi-fungsi
+`admin/actions.ts`, tanpa perlu mengubah bentuk halaman lagi.
 
 ### Soal `proxy.ts` — perhatikan nama ini
 
@@ -246,15 +266,37 @@ Mode `memory` **hanya untuk pengembangan**. Produksi wajib `prisma`.
 melambat di puluhan ribu. Komentar di kodenya sudah menandai: kalau sampai skala itu, pindah ke
 *full-text search* PostgreSQL.
 
-### 8.4 Penghitung "jumlah dibaca" belum tersambung
+### 8.4 Penghitung "jumlah dibaca" adalah perkiraan kasar
 
-Fungsinya sudah ada — `articleRepo.incrementViewCount()` — dan kegagalannya sengaja diabaikan
-supaya halaman artikel tetap tampil walaupun database sedang bermasalah. Tapi **belum ada satu
-halaman pun yang memanggilnya**, karena halaman memang belum memakai repository.
+Sejak PR #6, halaman detail artikel memanggil `articleRepo.incrementViewCount()` setiap kali dibuka.
+Kegagalannya sengaja diabaikan supaya halaman artikel tetap tampil walaupun database sedang
+bermasalah.
 
-Begitu nanti disambungkan, perlu disadari bahwa angkanya **perkiraan kasar**: bisa digelembungkan
-dengan me-refresh berulang, dan sesekali terlewat saat database bermasalah. Cukup untuk daftar
-"artikel populer", tidak cukup untuk laporan statistik.
+Angkanya **perkiraan kasar**: bisa digelembungkan dengan me-refresh berulang, dan sesekali terlewat
+saat database bermasalah. Cukup untuk daftar "artikel populer", tidak cukup untuk laporan statistik.
+
+### 8.5 Halaman depan dan `/articles` dibangun statis
+
+`npm run build` menandai `/` dan `/articles` sebagai halaman **statis**: isinya diambil dari database
+sekali saat build, lalu disimpan. Halaman itu baru diperbarui saat Server Action admin memanggil
+`revalidatePath("/")` dan `revalidatePath("/articles")` — yaitu setiap kali artikel dibuat, diubah,
+diterbitkan, atau dihapus.
+
+Konsekuensinya:
+
+- Artikel dari admin **tetap muncul** di depan, karena setiap penulisan memicu pembaruan
+- Daftar "artikel populer" **tidak** ikut bergerak saat artikel dibaca, karena menambah `viewCount`
+  tidak memicu pembaruan. Angkanya baru berubah di halaman depan setelah ada penulisan berikutnya
+  atau build ulang
+- Build membutuhkan database yang bisa dihubungi kalau `DATA_SOURCE=prisma`
+
+### 8.6 Gambar dari alamat luar
+
+Form admin mengizinkan alamat gambar `https://...`, dan halaman menampilkan gambar lewat
+`next/image`. Tapi `next.config.ts` belum punya `images.remotePatterns`. Dari membaca kode, gambar
+dari domain luar akan ditolak `next/image` saat artikelnya ditampilkan — **belum dicoba di browser**.
+Pilihan perbaikannya: daftarkan domain yang diizinkan di `next.config.ts`, atau batasi isian ke
+alamat `/images/...` sampai unggah gambar (Vercel Blob) tersedia.
 
 ---
 
@@ -268,7 +310,8 @@ dengan me-refresh berulang, dan sesekali terlewat saat database bermasalah. Cuku
 | Tabel atau kolom baru | `prisma/schema.prisma` + migration baru | **Wajib dibahas tim dulu** |
 | Aturan bisnis (slug, boleh terbit) | `src/server/services/` (rencana) | Wilayah Orang 4 |
 | Aturan validasi form | `src/lib/validation/` (rencana) | Wilayah Orang 4 |
-| Aksi form (simpan, hapus) | Server Action di dekat halaman yang memakainya | Periksa sesi dan validasi di dalamnya |
+| Aksi form (simpan, hapus) | Server Action di dekat halaman yang memakainya — contoh: `src/app/admin/actions.ts` | Periksa sesi dan validasi di dalamnya |
+| Aksi yang dipakai halaman publik | `src/app/actions/` — contoh: `articles.ts` | Hanya boleh memakai `articleRepo`, jangan `articleAdminRepo` |
 | Variabel setelan baru | `.env.example` — di PR yang sama | Tanpa nilai rahasia |
 | Pemeriksaan otomatis baru | `scripts/` sekarang; `tests/` (rencana) | Lihat [PENGUJIAN.md](./PENGUJIAN.md) |
 
