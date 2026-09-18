@@ -64,6 +64,10 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
   simpan sebagai draft, terbitkan/tarik, dan hapus artikel — tersimpan ke database lewat
   `articleAdminRepo`. Halaman admin menampilkan sumber data yang sedang aktif
 - Alamat artikel yang salah menampilkan halaman "tidak ditemukan" (`404`, dicek 18 Sep 2026)
+- Mode `DATA_SOURCE=memory`: artikel yang diterbitkan dari `/admin` kini ikut muncul di beranda,
+  `/articles`, dan halaman detail. Dulu admin dan halaman publik memakai dua array terpisah; sekarang
+  berbagi `src/server/repositories/in-memory-article-store.ts`. Diuji `verify:all` (bagian memori) dan
+  diklik lewat browser headless, 18 Sep 2026 — branch `fix/memori-admin-publik-bersama`, belum digabung
 - Aturan tampil publik — draft, artikel terjadwal, dan artikel arsip tidak terlihat lewat alamat,
   daftar, maupun pencarian — diuji 12 pengecekan di `verify:all`, dan terbukti menangkap kerusakan
   lewat uji mutasi (11 September 2026)
