@@ -77,7 +77,7 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
 | Gambar dari alamat luar | Form admin menerima `https://...`, tapi `next.config.ts` belum punya `images.remotePatterns` — dari membaca kode, `next/image` akan menolak gambar itu saat artikelnya ditampilkan. **Belum dicoba di browser** |
 | Daftar penulis ditulis tangan | `src/app/admin/page.tsx` — `DEFAULT_AUTHORS` berisi 5 nama tetap, bukan diambil dari database |
 | Menu kategori buntu | `src/components/Navbar.tsx` — enam menu masih `href: "#"` |
-| Halaman kategori & pencarian | Belum ada berkasnya. Fungsi `articleRepo.listByCategory()` dan `.search()` sudah tersedia |
+| Halaman kategori & pencarian | Belum ada berkasnya di GitHub. Halaman kategori dikerjakan `rizkikusnadi03` di branch `Navbar_Nasional`, tapi kodenya belum masuk (lihat catatan PR #4). Fungsi `articleRepo.listByCategory()` dan `.search()` sudah tersedia |
 | `/articles` belum berhalaman | `src/app/articles/page.tsx` hanya menampilkan 10 artikel pertama |
 | Jadwal tayang | Form admin belum bisa memilih tanggal terbit; database sudah mendukung lewat `publishedAt` |
 | Newsletter | `src/components/NewsletterForm.tsx:10` hanya memanggil `alert()` |
@@ -141,10 +141,33 @@ docs/                    dokumentasi tim
 | Orang 5 — Deploy & Testing | **belum ada** | `.github/workflows/`, `tests/`, `README.md` |
 
 Anggota organisasi ada 5: `kvnlhm`, `azridalimunthe7`, `fikarnugraha18`, `astroceilo`,
-`rizkikusnadi03`. Dua nama terakhir belum kebagian peran.
+`rizkikusnadi03`. Dua nama terakhir belum punya peran resmi di tabel ini, tapi **keduanya sudah
+berkontribusi** — lihat di bawah.
 
-PR #6 (menyambungkan halaman publik **dan** `/admin` ke repository) ditulis `kvnlhm` dan digabung
-`rizkikusnadi03`. PR itu menyentuh wilayah Orang 2 dan Orang 3 sekaligus.
+### Riwayat kontribusi per pull request
+
+Disusun dari riwayat git dan GitHub, diperiksa 18 September 2026.
+
+| PR | Isi | Dikerjakan | Digabung |
+|---|---|---|---|
+| #2 | Lapisan data: schema, repository, seed | `kvnlhm` | `azridalimunthe7`, 5 Sep |
+| #3 | Halaman admin (versi `localStorage`) dan tautan di footer | `fikarnugraha18` | `kvnlhm`, 6 Sep |
+| #4 | Dibuka dengan judul "tambah halaman kategori dan aktifkan link Nasional di navbar" | `rizkikusnadi03` — membuat branch `Navbar_Nasional` (11 Sep) dan membuka PR ini (16 Sep) | `kvnlhm`, 17 Sep |
+| #5 | Meneruskan isi PR #4 ke `main` | `kvnlhm` | `kvnlhm`, 17 Sep |
+| #6 | Halaman publik memakai repository + "Muat Lebih Banyak" (commit `dda2754`), lalu admin CRUD ke database (commit `dff05d6`) | `astroceilo` membuat branch `feat/fe-article-repo` dan menulis `dda2754`; `kvnlhm` menulis `dff05d6` | `rizkikusnadi03`, 17 Sep |
+
+Catatan:
+
+- Commit `dda2754` tercatat atas nama akun GitHub `astrophelc` (Idon). Branch-nya dibuat oleh
+  anggota organisasi `astroceilo` (Doni Anggara) dua menit sebelum commit itu, jadi kemungkinan besar
+  keduanya orang yang sama. Kalau benar, sebaiknya email git-nya disamakan supaya kontribusinya
+  tercatat di akun organisasi
+- **PR #4 arahnya terbalik:** dibuka dari `main` ke `Navbar_Nasional`, bukan sebaliknya. Akibatnya
+  isinya hanya commit dokumentasi yang sudah ada di `main`, dan **kode halaman kategori maupun
+  perubahan menu "Nasional" belum ada di GitHub** — `src/components/Navbar.tsx` masih `href: "#"`
+  untuk semua kategori. Kalau kodenya masih ada di komputer `rizkikusnadi03`, tinggal di-push ke
+  branch `Navbar_Nasional` lalu dibuka PR baru ke `main`
+- Selain PR, `rizkikusnadi03` juga menjadi yang menggabungkan PR #6 ke `main`
 
 ---
 
@@ -178,8 +201,9 @@ Diurutkan dari yang paling berisiko. Daftar lengkap beserta alasannya ada di `do
    Pilihan sementara yang perlu diputuskan pemilik `/admin`: biarkan saja karena belum di-deploy,
    atau matikan penulisan di luar mode pengembangan
 2. Proyek ini komersial atau bukan — Vercel paket gratis melarang pemakaian komersial
-3. Siapa Orang 4 dan Orang 5 — tanpa Orang 5, `main` tetap tidak terkunci. `rizkikusnadi03` sudah
-   mulai ikut (menggabungkan PR #6), tapi perannya belum ditetapkan
+3. Siapa Orang 4 dan Orang 5 — tanpa Orang 5, `main` tetap tidak terkunci. `astroceilo` dan
+   `rizkikusnadi03` sudah berkontribusi (lihat riwayat kontribusi di atas), tapi perannya belum
+   ditetapkan
 4. Editor boleh apa, Admin boleh apa
 
 ---

@@ -157,6 +157,15 @@ memakai agent:
 | Orang 4 — Validasi & SEO | belum ada | `src/lib/validation/`, `src/server/services/` |
 | Orang 5 — Deploy & Testing | belum ada | `.github/workflows/`, `tests/`, `README.md` |
 
+Dua anggota lain sudah berkontribusi walaupun belum punya peran resmi di tabel ini:
+
+| Orang | Kontribusi |
+|---|---|
+| [@astroceilo](https://github.com/astroceilo) | Menyambungkan halaman publik ke repository dan membuat tombol "Muat Lebih Banyak" berfungsi (PR #6, commit `dda2754`) |
+| [@rizkikusnadi03](https://github.com/rizkikusnadi03) | Mengerjakan halaman kategori dan menu "Nasional" di branch `Navbar_Nasional` (PR #4 — kodenya belum masuk, lihat STATUS.md); menggabungkan PR #6 |
+
+Riwayat lengkap per pull request ada di [STATUS.md](./STATUS.md#riwayat-kontribusi-per-pull-request).
+
 ---
 
 ## Deploy
