@@ -9,8 +9,9 @@
  * Uji Prisma menulis ke database sungguhan, lalu MEMBERSIHKAN sendiri barisnya
  * di akhir. Semua data uji diawali "uji-" supaya gampang dikenali.
  *
- * Khusus Prisma, ada satu rangkaian tambahan: aturan tampil publik dari sisi
- * articleRepo (temuan K-9 di docs/KEAMANAN.md). Penjelasannya di fungsinya.
+ * Ada satu rangkaian tambahan untuk kedua implementasi: aturan tampil publik
+ * dari sisi articleRepo (temuan K-9 di docs/KEAMANAN.md). Penjelasannya di
+ * fungsinya.
  *
  * Jalankan: npm run verify:all
  */
@@ -19,10 +20,12 @@
 import "../prisma/load-env-auto";
 
 import type { ArticleAdminRepository } from "@/server/repositories/article-admin-repository";
+import type { ArticleRepository } from "@/server/repositories/article-repository";
 import type { NewsletterRepository } from "@/server/repositories/newsletter-repository";
 import type { UserRepository } from "@/server/repositories/user-repository";
 
 import { inMemoryArticleAdminRepository } from "@/server/repositories/in-memory-article-admin-repository";
+import { inMemoryArticleRepository } from "@/server/repositories/in-memory-article-repository";
 import { inMemoryNewsletterRepository } from "@/server/repositories/in-memory-newsletter-repository";
 import { inMemoryUserRepository } from "@/server/repositories/in-memory-user-repository";
 
@@ -186,15 +189,18 @@ async function ujiAdmin({ adminRepo }: Trio) {
  * Sebelum ini, aturannya cuma ditegakkan di syaratTerbit() tanpa satu pun uji
  * dari sisi articleRepo. Kalau syarat itu rusak, semua uji lain tetap lulus.
  *
- * Hanya untuk Prisma. Di mode data contoh, articleRepo membaca articles.ts
- * sedangkan articleAdminRepo menyimpan di memori terpisah - artikel buatan admin
- * memang tidak pernah muncul di sisi publik, jadi uji ini tidak membuktikan
- * apa-apa di sana.
+ * Dijalankan untuk kedua implementasi. Dulu hanya Prisma, karena di mode data
+ * contoh articleRepo dan articleAdminRepo menyimpan di dua array terpisah:
+ * artikel yang diterbitkan dari admin tidak pernah muncul di halaman publik.
+ * Sekarang keduanya berbagi satu penyimpanan (in-memory-article-store.ts).
  *
  * Kasus "sudah terbit" itu kontrol positif. Tanpa dia, findBySlug yang rusak dan
  * selalu mengembalikan null juga akan lulus semua uji "tersembunyi".
  */
-async function ujiVisibilitasPublik() {
+async function ujiVisibilitasPublik(
+  adminRepo: ArticleAdminRepository,
+  publikRepo: ArticleRepository,
+) {
   console.log("\n  -- Aturan tampil publik (articleRepo) --");
 
   const kemarin = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -216,7 +222,7 @@ async function ujiVisibilitasPublik() {
   ] as const;
 
   for (const k of kasus) {
-    await prismaArticleAdminRepository.create({
+    await adminRepo.create({
       ...isi,
       slug: UJI_PREFIX_PUBLIK + k.slug,
       status: k.status,
@@ -225,17 +231,37 @@ async function ujiVisibilitasPublik() {
   }
 
   // Draft bisa bocor lewat tiga jalan: alamat yang ditebak, daftar, dan pencarian.
-  const daftar = await prismaArticleRepository.listPublished({ perPage: 50 });
-  const cari = await prismaArticleRepository.search("Artikel Uji Visibilitas", { perPage: 50 });
+  const daftar = await publikRepo.listPublished({ perPage: 50 });
+  const cari = await publikRepo.search("Artikel Uji Visibilitas", { perPage: 50 });
 
   for (const k of kasus) {
     const slug = UJI_PREFIX_PUBLIK + k.slug;
     const harapan = k.harusTerlihat ? "terlihat" : "tersembunyi";
 
-    const lewatAlamat = (await prismaArticleRepository.findBySlug(slug)) !== null;
+    const lewatAlamat = (await publikRepo.findBySlug(slug)) !== null;
     cek(`${k.nama}: ${harapan} lewat alamat`, lewatAlamat === k.harusTerlihat);
     cek(`${k.nama}: ${harapan} di daftar`, daftar.items.some((a) => a.slug === slug) === k.harusTerlihat);
     cek(`${k.nama}: ${harapan} di pencarian`, cari.items.some((a) => a.slug === slug) === k.harusTerlihat);
+  }
+
+  // Alur tombol "Terbitkan" di admin: buat sebagai DRAFT, lalu publish().
+  // Artikelnya harus langsung ikut di daftar "Lihat Semua".
+  const slugAdmin = UJI_PREFIX_PUBLIK + "dari-admin";
+  const draft = await adminRepo.create({ ...isi, slug: slugAdmin, status: "DRAFT" });
+  await adminRepo.publish(draft.id);
+
+  const setelahTerbit = await publikRepo.listPublished({ perPage: 50 });
+  cek("terbit dari admin: muncul di daftar", setelahTerbit.items.some((a) => a.slug === slugAdmin));
+  cek("terbit dari admin: bisa dibuka lewat alamat", (await publikRepo.findBySlug(slugAdmin)) !== null);
+
+  await adminRepo.unpublish(draft.id);
+  const setelahTarik = await publikRepo.listPublished({ perPage: 50 });
+  cek("ditarik dari admin: hilang dari daftar", !setelahTarik.items.some((a) => a.slug === slugAdmin));
+
+  // Data contoh tidak ikut dibersihkan bersihkanPrisma(), jadi dihapus di sini.
+  const sisa = await adminRepo.list({ query: isi.title, perPage: 50 });
+  for (const b of sisa.items) {
+    if (b.slug.startsWith(UJI_PREFIX_PUBLIK)) await adminRepo.remove(b.id);
   }
 }
 
@@ -272,6 +298,7 @@ async function main() {
     newsletterRepo: inMemoryNewsletterRepository,
     adminRepo: inMemoryArticleAdminRepository,
   });
+  await ujiVisibilitasPublik(inMemoryArticleAdminRepository, inMemoryArticleRepository);
 
   if (!process.env.DATABASE_URL) {
     console.log("\n  DATABASE_URL kosong - uji Prisma DILEWATI.\n");
@@ -282,7 +309,7 @@ async function main() {
         newsletterRepo: prismaNewsletterRepository,
         adminRepo: prismaArticleAdminRepository,
       });
-      await ujiVisibilitasPublik();
+      await ujiVisibilitasPublik(prismaArticleAdminRepository, prismaArticleRepository);
     } finally {
       await bersihkanPrisma();
     }

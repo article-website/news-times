@@ -1,71 +1,33 @@
 import {
   normalizeListParams,
   paginate,
-  type ArticleAdminDetail,
   type ArticleAdminSummary,
   type ArticleStatus,
   type Paginated,
 } from "@/server/domain/article";
-import {
-  seedArticles,
-  seedCategories,
-  slugify,
-} from "@/server/data/seed-source";
 import type {
   AdminListParams,
   ArticleAdminRepository,
   CreateArticleInput,
   UpdateArticleInput,
 } from "./article-admin-repository";
+import {
+  cariKategori,
+  cariPenulis,
+  idBaru,
+  semuaBaris as baris,
+  type Baris,
+} from "./in-memory-article-store";
 
 /**
  * Versi data contoh ArticleAdminRepository.
  *
- * Diisi 5 artikel yang sama dengan repository publik, supaya waktu Orang 3
- * membuka tabel admin isinya tidak kosong dan bisa langsung dicoba tombol
- * sunting, terbit, dan hapusnya.
+ * Baris-barisnya disimpan di in-memory-article-store.ts, yang juga dibaca
+ * repository publik. Jadi artikel yang diterbitkan di sini langsung muncul di
+ * halaman depan dan "Lihat Semua", sama seperti mode Prisma.
  *
  * Pemilik: Orang 1 (Database)
  */
-
-const kategoriBySlug = new Map(seedCategories.map((c) => [c.slug, c]));
-
-let urutan = 0;
-
-/**
- * Bentuk baris di "database" palsu ini.
- *
- * Isinya persis sama dengan ArticleAdminDetail. Dibikin nama sendiri supaya
- * kalau nanti butuh field internal tambahan (yang tidak ikut keluar ke
- * pemanggil), tinggal ditambah di sini tanpa mengubah kontraknya.
- */
-type Baris = ArticleAdminDetail;
-
-function buatBarisAwal(): Baris[] {
-  return seedArticles.map((a) => {
-    const categorySlug = slugify(a.categoryName);
-    return {
-      id: `mem-art-${++urutan}`,
-      slug: a.slug,
-      title: a.title,
-      excerpt: a.excerpt,
-      content: a.content,
-      imageUrl: a.imageUrl,
-      status: "PUBLISHED" as ArticleStatus,
-      publishedAt: a.publishedAt,
-      createdAt: a.publishedAt,
-      updatedAt: a.publishedAt,
-      viewCount: a.viewCount,
-      category: {
-        slug: categorySlug,
-        name: kategoriBySlug.get(categorySlug)?.name ?? a.categoryName,
-      },
-      author: { slug: slugify(a.authorName), name: a.authorName },
-    };
-  });
-}
-
-const baris: Baris[] = buatBarisAwal();
 
 function toSummary(b: Baris): ArticleAdminSummary {
   return {
@@ -79,12 +41,6 @@ function toSummary(b: Baris): ArticleAdminSummary {
     category: b.category,
     author: b.author,
   };
-}
-
-function cariKategori(slug: string) {
-  const k = kategoriBySlug.get(slug);
-  if (!k) throw new Error(`Kategori "${slug}" tidak ditemukan.`);
-  return { slug: k.slug, name: k.name };
 }
 
 export const inMemoryArticleAdminRepository: ArticleAdminRepository = {
@@ -120,7 +76,7 @@ export const inMemoryArticleAdminRepository: ArticleAdminRepository = {
 
     const sekarang = new Date();
     const b: Baris = {
-      id: `mem-art-${++urutan}`,
+      id: idBaru(),
       slug: input.slug,
       title: input.title,
       excerpt: input.excerpt,
@@ -132,7 +88,7 @@ export const inMemoryArticleAdminRepository: ArticleAdminRepository = {
       updatedAt: sekarang,
       viewCount: 0,
       category: cariKategori(input.categorySlug),
-      author: { slug: input.authorSlug, name: input.authorSlug },
+      author: cariPenulis(input.authorSlug),
     };
 
     baris.push(b);
@@ -154,7 +110,7 @@ export const inMemoryArticleAdminRepository: ArticleAdminRepository = {
       b.category = cariKategori(input.categorySlug);
     }
     if (input.authorSlug !== undefined) {
-      b.author = { slug: input.authorSlug, name: input.authorSlug };
+      b.author = cariPenulis(input.authorSlug);
     }
 
     b.updatedAt = new Date();

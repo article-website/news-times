@@ -7,13 +7,13 @@ import {
   type ListParams,
   type Paginated,
 } from "@/server/domain/article";
-import {
-  seedArticles,
-  seedCategories,
-  slugify,
-  type SeedArticle,
-} from "@/server/data/seed-source";
+import { seedCategories } from "@/server/data/seed-source";
 import type { ArticleRepository } from "./article-repository";
+import {
+  semuaBaris,
+  terlihatPublik,
+  type Baris,
+} from "./in-memory-article-store";
 
 /**
  * Versi DATA CONTOH dari ArticleRepository, isinya cuma array di memori.
@@ -21,6 +21,10 @@ import type { ArticleRepository } from "./article-repository";
  * Gunanya: Orang 2, 3, dan 4 bisa langsung ngoding di Sprint 1 tanpa nunggu
  * database Neon jadi. Begitu database siap, tinggal ganti satu baris di
  * index.ts dan semua kode halaman tetap sama persis.
+ *
+ * Membaca dari in-memory-article-store.ts, "tabel" yang sama dengan yang
+ * ditulis repository admin. Jadi artikel yang diterbitkan dari /admin ikut
+ * muncul di sini, dan draft tetap tersembunyi.
  *
  * Juga dipakai buat testing nanti, karena tidak butuh database sama sekali.
  *
@@ -32,54 +36,52 @@ import type { ArticleRepository } from "./article-repository";
  * Pemilik: Orang 1 (Database)
  */
 
-// --- susun data sekali di awal ---------------------------------------------
+// --- ambil yang boleh tampil ------------------------------------------------
 
-const categoryBySlug = new Map(seedCategories.map((c) => [c.slug, c]));
-
-/** Artikel diurutkan dari yang paling baru, sekali saja waktu modul dimuat. */
-const semuaArtikel: SeedArticle[] = [...seedArticles].sort(
-  (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
-);
-
-/** Penghitung dibaca disimpan terpisah supaya data seed-nya tidak ikut berubah. */
-const viewCounts = new Map(semuaArtikel.map((a) => [a.slug, a.viewCount]));
+/**
+ * Artikel yang boleh dilihat publik, terbaru di atas. Dihitung ulang tiap
+ * dipanggil, karena admin bisa menambah atau menarik artikel kapan saja.
+ *
+ * Urutannya sama dengan urutTerbaru di versi Prisma: tanggal terbit, lalu slug
+ * sebagai pemecah seri.
+ */
+function artikelTerbit(): Baris[] {
+  const sekarang = new Date();
+  return semuaBaris
+    .filter((b) => terlihatPublik(b, sekarang))
+    .sort(
+      (a, b) =>
+        b.publishedAt!.getTime() - a.publishedAt!.getTime() ||
+        a.slug.localeCompare(b.slug),
+    );
+}
 
 // --- pengubah bentuk --------------------------------------------------------
 
-function toSummary(a: SeedArticle): ArticleSummary {
-  const categorySlug = slugify(a.categoryName);
-  const category = categoryBySlug.get(categorySlug);
-
+function toSummary(b: Baris): ArticleSummary {
   return {
-    slug: a.slug,
-    title: a.title,
-    excerpt: a.excerpt,
-    imageUrl: a.imageUrl,
-    publishedAt: a.publishedAt,
-    viewCount: viewCounts.get(a.slug) ?? a.viewCount,
-    category: {
-      slug: categorySlug,
-      name: category?.name ?? a.categoryName,
-    },
-    author: {
-      slug: slugify(a.authorName),
-      name: a.authorName,
-    },
+    slug: b.slug,
+    title: b.title,
+    excerpt: b.excerpt,
+    imageUrl: b.imageUrl,
+    publishedAt: b.publishedAt,
+    viewCount: b.viewCount,
+    category: { slug: b.category.slug, name: b.category.name },
+    author: { slug: b.author.slug, name: b.author.name },
   };
 }
 
-function toDetail(a: SeedArticle): ArticleDetail {
+function toDetail(b: Baris): ArticleDetail {
   return {
-    ...toSummary(a),
-    content: a.content,
-    status: "PUBLISHED",
-    // Data lama tidak punya kolom ini, jadi disamakan dengan tanggal terbit.
-    updatedAt: a.publishedAt,
+    ...toSummary(b),
+    content: b.content,
+    status: b.status,
+    updatedAt: b.updatedAt,
   };
 }
 
 function ambilHalaman(
-  sumber: SeedArticle[],
+  sumber: Baris[],
   params?: ListParams,
 ): Paginated<ArticleSummary> {
   const { page, perPage, skip } = normalizeListParams(params);
@@ -91,17 +93,17 @@ function ambilHalaman(
 
 export const inMemoryArticleRepository: ArticleRepository = {
   async listPublished(params) {
-    return ambilHalaman(semuaArtikel, params);
+    return ambilHalaman(artikelTerbit(), params);
   },
 
   async findBySlug(slug) {
-    const ketemu = semuaArtikel.find((a) => a.slug === slug);
+    const ketemu = artikelTerbit().find((b) => b.slug === slug);
     return ketemu ? toDetail(ketemu) : null;
   },
 
   async listByCategory(categorySlug, params) {
-    const cocok = semuaArtikel.filter(
-      (a) => slugify(a.categoryName) === categorySlug,
+    const cocok = artikelTerbit().filter(
+      (b) => b.category.slug === categorySlug,
     );
     return ambilHalaman(cocok, params);
   },
@@ -113,43 +115,37 @@ export const inMemoryArticleRepository: ArticleRepository = {
       return paginate<ArticleSummary>([], 0, page, perPage);
     }
 
-    const cocok = semuaArtikel.filter(
-      (a) =>
-        a.title.toLowerCase().includes(kunci) ||
-        a.excerpt.toLowerCase().includes(kunci),
+    const cocok = artikelTerbit().filter(
+      (b) =>
+        b.title.toLowerCase().includes(kunci) ||
+        b.excerpt.toLowerCase().includes(kunci),
     );
     return ambilHalaman(cocok, params);
   },
 
   async listPopular(limit = 5) {
-    return [...semuaArtikel]
-      .sort(
-        (a, b) =>
-          (viewCounts.get(b.slug) ?? 0) - (viewCounts.get(a.slug) ?? 0),
-      )
+    return artikelTerbit()
+      .sort((a, b) => b.viewCount - a.viewCount || a.slug.localeCompare(b.slug))
       .slice(0, limit)
       .map(toSummary);
   },
 
   async listFeatured(limit = 3) {
-    return semuaArtikel.slice(0, limit).map(toSummary);
+    return artikelTerbit().slice(0, limit).map(toSummary);
   },
 
   async listCategories(): Promise<Category[]> {
+    const terbit = artikelTerbit();
     return seedCategories.map((c) => ({
       slug: c.slug,
       name: c.name,
       order: c.order,
-      articleCount: semuaArtikel.filter(
-        (a) => slugify(a.categoryName) === c.slug,
-      ).length,
+      articleCount: terbit.filter((b) => b.category.slug === c.slug).length,
     }));
   },
 
   async incrementViewCount(slug) {
-    const sekarang = viewCounts.get(slug);
-    if (sekarang !== undefined) {
-      viewCounts.set(slug, sekarang + 1);
-    }
+    const b = semuaBaris.find((x) => x.slug === slug);
+    if (b) b.viewCount++;
   },
 };
