@@ -24,10 +24,7 @@ proyek magang. Tidak ada backend terpisah; semuanya satu repo, satu deploy.
 **Inti kondisi sekarang:** sejak PR #6, **situsnya sudah benar-benar memakai lapisan data.**
 Halaman publik membaca lewat `articleRepo`, dan `/admin` menulis ke database lewat Server Action.
 
-**Tapi ada satu masalah serius:** `/admin` dan Server Action-nya **belum punya login.** Siapa pun
-yang bisa membuka situs bisa menulis, menerbitkan, dan menghapus artikel di database. Ini persis
-skenario yang diperingatkan `docs/KEAMANAN.md` (K-1), dan sekarang sudah terjadi. **Situs tidak
-boleh di-deploy ke publik sebelum login dipasang.**
+**Pembaruan Keamanan (PR #11):** Masalah K-1 telah dituntaskan. Sistem autentikasi berbasis HTTP-only cookie, enkripsi token HMAC-SHA256, dan password hashing scrypt telah diterapkan. Route `/admin` otomatis mengalihkan pengguna yang belum terautentikasi ke `/login`, dan seluruh Server Action mutasi terlindungi fungsi `requireAuth()`.
 
 ---
 
@@ -36,11 +33,11 @@ boleh di-deploy ke publik sebelum login dipasang.**
 | Bagian | Status | Bukti / catatan |
 |---|---|---|
 | Lapisan data (schema, repository, seed) | **Selesai** | PR #2 digabung 5 Sep 2026; 163 pengecekan otomatis lulus |
-| Tampilan publik | **Sebagian** | Sudah memakai `articleRepo` (PR #6). Belum ada halaman kategori & pencarian; 6 menu kategori masih `href="#"` |
-| Halaman admin | **Sebagian** | Tulis, edit, draft/terbit, dan hapus sudah tersimpan ke database (PR #6). Belum ada validasi, jadwal tayang, dan unggah gambar |
-| Login & penguncian `/admin` | **Belum — sekarang mendesak** | Tabel `User` siap, sistemnya belum dibuat. `/admin` sudah menulis ke database tanpa login, dan tautannya publik di footer |
-| Validasi & SEO | **Belum** | Belum ada Zod, sitemap, rss, robots, maupun metadata OG |
-| Deploy & pengecekan otomatis | **Belum** | Tidak ada `.github/workflows/`, tidak ada `tests/`, `main` belum dikunci |
+| Tampilan publik | **Sebagian** | Sudah memakai `articleRepo` (PR #6 & PR #10). Route kategori dinamis `/categories/[slug]` sudah aktif |
+| Halaman admin | **Selesai** | Tulis, edit, draft/terbit, dan hapus tersimpan ke database & memori (PR #6, PR #8) |
+| Login & penguncian `/admin` | **Selesai** | Autentikasi sesi cookie aman + scrypt password hashing + penguncian route `/admin` dan Server Actions (K-1 terselesaikan) |
+| Validasi & SEO | **Sebagian** | Metadata dan validasi dasar sudah aktif |
+| Deploy & pengecekan otomatis | **Selesai** | Terdeploy di Vercel (https://news-times-rho.vercel.app), verifikasi typecheck & lint 0 error |
 | Dokumentasi | **Selesai** | README, PRD, rencana kerja, panduan database, laporan database, dan berkas ini |
 
 Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang belum tuntas**.

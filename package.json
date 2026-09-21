@@ -18,6 +18,7 @@
     "verify:repo": "tsx scripts/verify-article-repository.ts",
     "verify:compare": "tsx --conditions=react-server scripts/compare-repositories.ts",
     "verify:all": "tsx --conditions=react-server scripts/verify-all-repositories.ts",
+    "verify:auth": "tsx --conditions=react-server scripts/verify-auth.ts",
     "coba": "tsx --conditions=react-server scripts/coba-sendiri.ts"
   },
   "dependencies": {

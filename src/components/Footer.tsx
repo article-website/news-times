@@ -18,29 +18,24 @@ export default function Footer() {
           <h4 className="text-white font-semibold mb-3">Navigasi</h4>
           <ul className="flex flex-col gap-2 text-sm">
             <li>
-              <a href="/" className="hover:text-white">
+              <Link href="/" className="hover:text-white">
                 Beranda
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/about" className="hover:text-white">
                 Tentang Kami
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
-                Kategori
-              </a>
+              <Link href="/articles" className="hover:text-white">
+                Semua Artikel
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
-                Kontak
-              </a>
-            </li>
-            <li>
-              <a href="/admin" className="hover:text-white text-gray-400">
+              <Link href="/admin" className="hover:text-white text-gray-400">
                 Redaksi (Admin)
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -49,31 +44,31 @@ export default function Footer() {
           <h4 className="text-white font-semibold mb-3">Kategori</h4>
           <ul className="flex flex-col gap-2 text-sm">
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/nasional" className="hover:text-white">
                 Nasional
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/internasional" className="hover:text-white">
                 Internasional
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/ekonomi" className="hover:text-white">
                 Ekonomi
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/teknologi" className="hover:text-white">
                 Teknologi
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
 
         <div>
           <h4 className="text-white font-semibold mb-3">Kontak</h4>
-          <p className="text-sm text-gray-400">info@newshub.id</p>
+          <p className="text-sm text-gray-400">info@newstimes.id</p>
           <p className="text-sm text-gray-400 mt-2">
             Jl. Merdeka No. 123, Jakarta, Indonesia
           </p>
@@ -81,7 +76,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-slate-800 text-center text-xs text-gray-500 py-4">
-        © {new Date().getFullYear()} NewsHub. Semua Hak Dilindungi.
+        © {new Date().getFullYear()} NewsTimes. Semua Hak Dilindungi.
       </div>
     </footer>
   );
