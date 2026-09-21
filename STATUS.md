@@ -1,9 +1,9 @@
 # STATUS — NewsTimes
 
-> **Diperbarui:** 18 September 2026 · **Kode aplikasi terakhir berubah di commit `5a28131`**
-> (PR #6 digabung 17 Sep 2026)
+> **Diperbarui:** 21 September 2026 · **Kode aplikasi terakhir berubah di commit `df62d1d`**
+> (PR #8 digabung 18 Sep 2026)
 >
-> Seluruh hasil pengujian di bawah dijalankan ulang di `5a28131`. Kalau ada commit baru yang
+> Seluruh hasil pengujian di bawah dijalankan ulang di `df62d1d`. Kalau ada commit baru yang
 > mengubah isi `src/`, `prisma/`, atau `package.json`, jalankan ulang pengujiannya dan perbarui
 > tanggal di atas.
 >
@@ -67,7 +67,7 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
 - Mode `DATA_SOURCE=memory`: artikel yang diterbitkan dari `/admin` kini ikut muncul di beranda,
   `/articles`, dan halaman detail. Dulu admin dan halaman publik memakai dua array terpisah; sekarang
   berbagi `src/server/repositories/in-memory-article-store.ts`. Diuji `verify:all` (bagian memori) dan
-  diklik lewat browser headless, 18 Sep 2026 — branch `fix/memori-admin-publik-bersama`, belum digabung
+  diklik lewat browser headless, 18 Sep 2026 — PR #8 digabung (commit `df62d1d`)
 - Aturan tampil publik — draft, artikel terjadwal, dan artikel arsip tidak terlihat lewat alamat,
   daftar, maupun pencarian — diuji 12 pengecekan di `verify:all`, dan terbukti menangkap kerusakan
   lewat uji mutasi (11 September 2026)
@@ -86,7 +86,7 @@ Mengacu ke jadwal di `docs/RENCANA-KERJA.md`, posisi tim ada di **Sprint 1 yang 
 | Jadwal tayang | Form admin belum bisa memilih tanggal terbit; database sudah mendukung lewat `publishedAt` |
 | Newsletter | `src/components/NewsletterForm.tsx:10` hanya memanggil `alert()` |
 | Tampilan loading & error | Belum ada `loading.tsx` maupun `error.tsx` di mana pun |
-| Pengecekan otomatis | Tidak ada `.github/workflows/`; `npm run lint` masih 1 error sehingga CI akan langsung merah |
+| Pengecekan otomatis | Tidak ada `.github/workflows/`; `npm run lint` sudah PASS 0 error |
 
 ---
 
@@ -159,6 +159,7 @@ Disusun dari riwayat git dan GitHub, diperiksa 18 September 2026.
 | #4 | Dibuka dengan judul "tambah halaman kategori dan aktifkan link Nasional di navbar" | `rizkikusnadi03` — membuat branch `Navbar_Nasional` (11 Sep) dan membuka PR ini (16 Sep) | `kvnlhm`, 17 Sep |
 | #5 | Meneruskan isi PR #4 ke `main` | `kvnlhm` | `kvnlhm`, 17 Sep |
 | #6 | Halaman publik memakai repository + "Muat Lebih Banyak" (commit `dda2754`), lalu admin CRUD ke database (commit `dff05d6`) | `astroceilo` membuat branch `feat/fe-article-repo` dan menulis `dda2754`; `kvnlhm` menulis `dff05d6` | `rizkikusnadi03`, 17 Sep |
+| #8 | Mode memory: admin dan publik berbagi in-memory store, uji aturan tampil publik | `kvnlhm` | `kvnlhm`, 18 Sep |
 
 Catatan:
 
@@ -177,16 +178,16 @@ Catatan:
 
 ## Perintah dan hasil terakhir
 
-Semuanya dijalankan ulang **18 September 2026** di commit `5a28131`, dengan `DATA_SOURCE=prisma`.
+Semuanya dijalankan ulang **21 September 2026** di commit `df62d1d`, dengan `DATA_SOURCE=prisma`.
 
 | Perintah | Hasil terakhir |
 |---|---|
 | `npm run typecheck` | **PASS** |
 | `npm run build` | **PASS** — 6 halaman; `/` dan `/articles` dibangun statis, `/admin` dan detail artikel dinamis |
-| `npm run lint` | **FAIL — 1 error, 1 warning**, keduanya di `src/components/Footer.tsx` (`<a href="/">` di baris 21; `Link` di-import tapi tidak dipakai). Error di `admin/page.tsx` sudah hilang karena berkasnya ditulis ulang di PR #6 |
+| `npm run lint` | **PASS** — 0 error, 0 warning (sudah diperbaiki di `src/components/Footer.tsx`) |
 | `npm run verify:repo` | **PASS** — 37 pengecekan, tidak butuh database |
 | `npm run verify:compare` | **PASS** — 20 sama, 0 beda |
-| `npm run verify:all` | **PASS** — 106 pengecekan, butuh database; data ujinya dibersihkan sendiri |
+| `npm run verify:all` | **PASS** — 124 pengecekan (62 memori + 62 Prisma), butuh database; data ujinya dibersihkan sendiri |
 | Uji asap HTTP ke build produksi | **PASS** — `/`, `/articles`, detail artikel, `/about`, `/admin` → `200`; alamat salah → `404` |
 | `npm run db:migrate` / `db:seed` / `db:reset` | **NOT_RUN** sejak PR #3 masuk (terakhir PASS 5 Sep) |
 | Alur admin di browser (tulis → terbit → muncul di depan → hapus) | **NOT_RUN** — belum diklik di browser sungguhan. Server Action-nya belum punya pengujian otomatis |
