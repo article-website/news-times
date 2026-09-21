@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const categories = [
   "Nasional",
   "Internasional",
@@ -14,13 +16,13 @@ export default function CategoryList() {
       <ul className="flex flex-col">
         {categories.map((category) => (
           <li key={category}>
-            <a
-              href="#"
+            <Link
+              href={`/categories/${category.toLowerCase()}`}
               className="flex items-center justify-between py-2 text-sm text-gray-700 hover:text-blue-600 transition-colors"
             >
               {category}
               <span>›</span>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
