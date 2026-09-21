@@ -18,9 +18,9 @@ export default function Footer() {
           <h4 className="text-white font-semibold mb-3">Navigasi</h4>
           <ul className="flex flex-col gap-2 text-sm">
             <li>
-              <a href="/" className="hover:text-white">
+              <Link href="/" className="hover:text-white">
                 Beranda
-              </a>
+              </Link>
             </li>
             <li>
               <a href="#" className="hover:text-white">
@@ -38,9 +38,9 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="/admin" className="hover:text-white text-gray-400">
+              <Link href="/admin" className="hover:text-white text-gray-400">
                 Redaksi (Admin)
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -73,7 +73,7 @@ export default function Footer() {
 
         <div>
           <h4 className="text-white font-semibold mb-3">Kontak</h4>
-          <p className="text-sm text-gray-400">info@newshub.id</p>
+          <p className="text-sm text-gray-400">info@newstimes.id</p>
           <p className="text-sm text-gray-400 mt-2">
             Jl. Merdeka No. 123, Jakarta, Indonesia
           </p>
@@ -81,7 +81,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-slate-800 text-center text-xs text-gray-500 py-4">
-        © {new Date().getFullYear()} NewsHub. Semua Hak Dilindungi.
+        © {new Date().getFullYear()} NewsTimes. Semua Hak Dilindungi.
       </div>
     </footer>
   );
