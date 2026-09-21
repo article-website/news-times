@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getSession } from "@/server/auth";
-import {
-  articleAdminRepo,
-  articleRepo,
-  sumberDataAktif,
-} from "@/server/repositories";
+import { articleAdminRepo, articleRepo } from "@/server/repositories";
 import AdminArticlesClient from "./AdminArticlesClient";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +35,6 @@ export default async function AdminArticlesPage() {
       initialArticles={articles}
       categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
       authors={DEFAULT_AUTHORS}
-      sumberData={sumberDataAktif}
       currentUser={session}
     />
   );

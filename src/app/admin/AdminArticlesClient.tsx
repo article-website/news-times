@@ -20,7 +20,6 @@ interface AdminArticlesClientProps {
   initialArticles: ArticleAdminSummary[];
   categories: OptionItem[];
   authors: OptionItem[];
-  sumberData: string;
   currentUser?: {
     name: string;
     email: string;
@@ -32,7 +31,6 @@ export default function AdminArticlesClient({
   initialArticles,
   categories,
   authors,
-  sumberData,
   currentUser,
 }: AdminArticlesClientProps) {
   const [articlesList, setArticlesList] = useState<ArticleAdminSummary[]>(initialArticles);
@@ -242,21 +240,8 @@ export default function AdminArticlesClient({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 font-medium">Sumber data:</span>
-            <span
-              className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                sumberData === "prisma"
-                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                  : "bg-amber-100 text-amber-800 border border-amber-200"
-              }`}
-            >
-              {sumberData === "prisma" ? "PostgreSQL (Neon)" : "In-Memory"}
-            </span>
-          </div>
-
           {currentUser && (
-            <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
+            <div className="flex items-center gap-2.5">
               <div className="text-right">
                 <div className="text-xs font-semibold text-gray-900">{currentUser.name}</div>
                 <div className="text-[10px] text-gray-500">{currentUser.email}</div>
