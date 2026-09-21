@@ -28,9 +28,9 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/nasional" className="hover:text-white">
                 Kategori
-              </a>
+              </Link>
             </li>
             <li>
               <a href="#" className="hover:text-white">
@@ -49,24 +49,24 @@ export default function Footer() {
           <h4 className="text-white font-semibold mb-3">Kategori</h4>
           <ul className="flex flex-col gap-2 text-sm">
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/nasional" className="hover:text-white">
                 Nasional
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/internasional" className="hover:text-white">
                 Internasional
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/ekonomi" className="hover:text-white">
                 Ekonomi
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/categories/teknologi" className="hover:text-white">
                 Teknologi
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

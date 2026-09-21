@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Beranda", href: "/" },
-  { label: "Nasional", href: "#" },
-  { label: "Internasional", href: "#" },
-  { label: "Ekonomi", href: "#" },
-  { label: "Teknologi", href: "#" },
-  { label: "Olahraga", href: "#" },
-  { label: "Lifestyle", href: "#" },
+  { label: "Nasional", href: "/categories/nasional" },
+  { label: "Internasional", href: "/categories/internasional" },
+  { label: "Ekonomi", href: "/categories/ekonomi" },
+  { label: "Teknologi", href: "/categories/teknologi" },
+  { label: "Olahraga", href: "/categories/olahraga" },
+  { label: "Lifestyle", href: "/categories/lifestyle" },
 ];
 
 export default function Navbar() {
