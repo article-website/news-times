@@ -1,6 +1,7 @@
 "use server";
 
 import { articleAdminRepo } from "@/server/repositories";
+import { requireAuth } from "@/server/auth";
 import { revalidatePath } from "next/cache";
 import type { ArticleStatus } from "@/server/domain/article";
 
@@ -25,6 +26,8 @@ export interface ArticleFormData {
 
 export async function createArticleAction(data: ArticleFormData) {
   try {
+    await requireAuth();
+
     const title = data.title?.trim();
     const content = data.content?.trim();
 
@@ -74,6 +77,8 @@ export async function createArticleAction(data: ArticleFormData) {
 
 export async function updateArticleAction(id: string, data: ArticleFormData) {
   try {
+    await requireAuth();
+
     const title = data.title?.trim();
     const content = data.content?.trim();
 
@@ -131,6 +136,8 @@ export async function updateArticleAction(id: string, data: ArticleFormData) {
 
 export async function deleteArticleAction(id: string) {
   try {
+    await requireAuth();
+
     const success = await articleAdminRepo.remove(id);
     if (!success) {
       return { ok: false, error: "Artikel tidak ditemukan atau sudah dihapus." };
@@ -149,6 +156,8 @@ export async function deleteArticleAction(id: string) {
 
 export async function togglePublishAction(id: string, currentStatus: ArticleStatus) {
   try {
+    await requireAuth();
+
     if (currentStatus === "PUBLISHED") {
       await articleAdminRepo.unpublish(id);
     } else {
@@ -168,6 +177,8 @@ export async function togglePublishAction(id: string, currentStatus: ArticleStat
 
 export async function getArticleDetailAction(id: string) {
   try {
+    await requireAuth();
+
     const article = await articleAdminRepo.findById(id);
     if (!article) return null;
     return {

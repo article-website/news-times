@@ -1,11 +1,15 @@
-import {
-  articleAdminRepo,
-  articleRepo,
-  sumberDataAktif,
-} from "@/server/repositories";
+import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { getSession } from "@/server/auth";
+import { articleAdminRepo, articleRepo } from "@/server/repositories";
 import AdminArticlesClient from "./AdminArticlesClient";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Kelola Berita - Admin NewsTimes",
+  description: "Panel administrasi redaksi NewsTimes.",
+};
 
 const DEFAULT_AUTHORS = [
   { slug: "bayu-saputra", name: "Bayu Saputra" },
@@ -16,6 +20,11 @@ const DEFAULT_AUTHORS = [
 ];
 
 export default async function AdminArticlesPage() {
+  const session = await getSession();
+  if (!session) {
+    redirect("/login");
+  }
+
   const [{ items: articles }, categories] = await Promise.all([
     articleAdminRepo.list({ perPage: 100 }),
     articleRepo.listCategories(),
@@ -26,7 +35,7 @@ export default async function AdminArticlesPage() {
       initialArticles={articles}
       categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
       authors={DEFAULT_AUTHORS}
-      sumberData={sumberDataAktif}
+      currentUser={session}
     />
   );
 }

@@ -56,9 +56,11 @@ export default function Navbar() {
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </button>
-          <button
-            aria-label="Akun"
-            className="text-gray-600 hover:text-gray-900"
+          <Link
+            href="/admin"
+            aria-label="Admin / Akun"
+            title="Panel Admin"
+            className="text-gray-600 hover:text-blue-600 transition-colors"
           >
             <svg
               width="22"
@@ -71,7 +73,7 @@ export default function Navbar() {
               <circle cx="12" cy="8" r="4" />
               <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </header>

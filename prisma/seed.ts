@@ -107,6 +107,27 @@ async function main() {
     }
     console.log(`  Artikel  : ${dibuat}`);
 
+    // --- 4. Akun Administrator --------------------------------------------
+    const adminEmail = "admin@newstimes.id";
+    const adminHash =
+      "scrypt:541d99c7ca06bc0f7f6eaa46efdd58cf:b940cdab4c44dd085f6e1496ac651dcadf5604bcb662d79e18f4ecdbddf3b02f61fbe8abc08dc924603d17b5da0e34da434fdb01cd4ea9da280a5f1b215f4543";
+
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      create: {
+        email: adminEmail,
+        name: "Administrator",
+        passwordHash: adminHash,
+        role: "ADMIN",
+      },
+      update: {
+        name: "Administrator",
+        passwordHash: adminHash,
+        role: "ADMIN",
+      },
+    });
+    console.log(`  Admin    : 1 (${adminEmail})`);
+
     console.log("\nSeed selesai.");
   } finally {
     // Selalu tutup koneksi, walaupun di tengah jalan ada error.

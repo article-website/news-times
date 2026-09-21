@@ -23,19 +23,14 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
+              <Link href="/about" className="hover:text-white">
                 Tentang Kami
-              </a>
-            </li>
-            <li>
-              <Link href="/categories/nasional" className="hover:text-white">
-                Kategori
               </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white">
-                Kontak
-              </a>
+              <Link href="/articles" className="hover:text-white">
+                Semua Artikel
+              </Link>
             </li>
             <li>
               <Link href="/admin" className="hover:text-white text-gray-400">
