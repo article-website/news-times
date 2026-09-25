@@ -46,9 +46,17 @@ export function getPrisma(): PrismaClient {
     return globalForPrisma.prisma;
   }
 
-  const connectionString =
-    process.env.DATABASE_URL ||
-    "postgresql://neondb_owner:npg_7Qg3uBeyNHVZ@ep-summer-water-b3fbpgg2-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require";
+  const connectionString = process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL belum di-set. Di lokal: salin .env.example jadi .env.local, lalu isi " +
+        "connection string dari Neon punyamu sendiri. Di Vercel: isi di Settings > Environment " +
+        "Variables. Kalau memang belum mau pakai database, set DATA_SOURCE=memory. " +
+        "JANGAN menanam connection string di berkas ini sebagai nilai cadangan — repo ini publik, " +
+        "dan itu pernah terjadi (lihat K-10 di docs/KEAMANAN.md).",
+    );
+  }
 
   // Mulai Prisma 7, koneksi wajib lewat driver adapter seperti ini.
   const client = new PrismaClient({
