@@ -3,6 +3,9 @@
 > **Hasil audit:** 11 September 2026 · kondisi `main` di commit `bdf88c4`
 > **Diperbarui:** 18 September 2026 · kondisi `main` di commit `5a28131` (setelah PR #6) — K-1 naik
 > menjadi **kritis**, K-3 dan K-8 diperbarui. Perintah di bagian 9 dijalankan ulang, hasilnya sama.
+> **Diperbarui:** 25 September 2026 · kondisi `main` di commit `314f3c8` — temuan baru **K-10
+> (kritis): connection string Neon tertanam di kode dan sudah terbit di repo publik.** Dua anggapan
+> dasar audit lama ikut gugur: situs **sudah** di-deploy, dan riwayat git **sudah** memuat rahasia.
 >
 > Dokumen ini berisi **temuan dari pemeriksaan sungguhan**, bukan daftar saran umum. Setiap temuan
 > menyebutkan buktinya dan cara mengulangi pemeriksaannya (lihat [bagian 9](#9-cara-mengulang-audit-ini)).
@@ -30,8 +33,13 @@
 ## 1. Ringkasan
 
 **Kabar baiknya:** fondasinya sudah benar. Tidak ada celah injeksi SQL, tidak ada celah XSS di
-tampilan artikel, tidak ada satu pun rahasia yang pernah masuk ke riwayat git, dan kode database
-dipagari supaya tidak bisa terbawa ke browser.
+tampilan artikel, dan kode database dipagari supaya tidak bisa terbawa ke browser.
+
+**Yang paling mendesak per 25 September 2026: K-10.** Connection string database Neon — lengkap
+dengan password — tertanam di `src/server/db/client.ts` sebagai nilai cadangan sejak commit `1ad0cd9`
+(21 Sep, masuk lewat PR #11). Repo `article-website/news-times` berstatus **publik**, jadi rahasia itu
+terbaca siapa saja. Kalimat "tidak ada satu pun rahasia yang pernah masuk ke riwayat git" di audit
+11 dan 18 September **sudah tidak berlaku.**
 
 **Yang perlu diwaspadai:** risiko terbesar yang diperingatkan audit 11 September **sudah terjadi**.
 
@@ -40,9 +48,8 @@ dipagari supaya tidak bisa terbawa ke browser.
 > menyambungkan `/admin` ke database, dan login belum ada. **Sekarang siapa pun yang bisa membuka
 > situs bisa menulis, menerbitkan, dan menghapus artikel di database.**
 
-Dampaknya masih terbatas karena situs **belum pernah di-deploy** — yang bisa membukanya hanya orang
-yang menjalankan `npm run dev` di komputernya sendiri. Aturannya sekarang: **jangan deploy ke publik
-sebelum login dan pemeriksaan sesi di setiap Server Action terpasang.**
+K-1 itu sendiri sudah ditangani PR #11 (login admin, digabung 21 Sep 2026). Tetapi anggapan "situs
+belum pernah di-deploy" yang dipakai audit sebelumnya juga sudah gugur: situs berjalan di Vercel.
 
 ---
 
@@ -50,6 +57,7 @@ sebelum login dan pemeriksaan sesi di setiap Server Action terpasang.**
 
 | # | Tingkat | Temuan | Bukti | Pemilik |
 |---|---|---|---|---|
+| **K-10** | **Kritis** (sejak PR #11) | Connection string Neon lengkap dengan password tertanam di kode, dan repo-nya publik | `src/server/db/client.ts` baris 49–51 di commit `1ad0cd9` (21 Sep 2026), ada di `main` sampai commit `314f3c8`. Terbukti dipakai produksi: `news-times-project.vercel.app` menampilkan artikel yang hanya ada di database pengembangan | Orang 1 |
 | **K-1** | **Kritis** (sejak PR #6) | Halaman redaksi dan Server Action-nya tidak terkunci, sudah menulis ke database, dan tautannya publik | `src/app/admin/page.tsx` dan kelima fungsi di `src/app/admin/actions.ts` tanpa pemeriksaan sesi; tautan "Redaksi (Admin)" di `src/components/Footer.tsx`; tidak ada `proxy.ts` | Orang 3 |
 | **K-2** | Sedang | Belum ada sistem login sama sekali | Tabel `User` ada, tapi tidak ada kode autentikasi di `src/` | Orang 3 |
 | **K-3** | Sedang | Belum ada validasi input di batas sistem | Tidak ada Zod maupun `src/lib/validation/`. `src/app/admin/actions.ts` hanya memeriksa judul dan isi tidak kosong; panjang teks, kategori, penulis, status, dan alamat gambar diterima apa adanya | Orang 4 |
@@ -59,6 +67,35 @@ sebelum login dan pemeriksaan sesi di setiap Server Action terpasang.**
 | **K-6** | Rendah | Belum ada header keamanan (CSP, perlindungan *clickjacking*) | `next.config.ts` hanya berisi `reactCompiler: true` | Orang 5 |
 | **K-7** | Rendah | Proses kerja tanpa penjaga: `main` tidak dikunci, PR digabung tanpa review | PR #2, #3, dan #6: 0 review. PR #6 membuka K-1 tanpa ada yang menahan. Tidak ada `.github/workflows/` | Orang 5 |
 | **K-8** | Info | Jumlah dibaca bisa digelembungkan | Sejak PR #6, `src/app/articles/[slug]/page.tsx` memanggil `incrementViewCount()` setiap kali dibuka; refresh berulang menaikkan angkanya | Orang 1 |
+
+### K-10 — rahasia database terbit di repo publik
+
+**Apa yang terjadi.** Commit `1ad0cd9` ("fix(db): sediakan connection string Neon fallback agar build
+serverless sukses otomatis", 21 Sep 2026) mengganti pemeriksaan `DATABASE_URL` yang tadinya melempar
+error menjadi nilai cadangan berisi connection string asli, lengkap dengan password. Commit itu masuk
+`main` lewat PR #11.
+
+**Kenapa kritis.**
+
+1. Repo `article-website/news-times` **publik**. Password database terbaca siapa saja, dan sudah
+   terbit sekitar empat hari sebelum ditemukan (21–25 Sep 2026).
+2. Siapa pun yang menyalinnya bisa membaca, mengubah, dan **menghapus seluruh isi database** lewat
+   koneksi langsung. Login admin dari PR #11 tidak menghalangi ini sama sekali — login menjaga pintu
+   aplikasi, bukan pintu database.
+3. Karena alamat database ada di kode, deploy mana pun menyambung sendiri ke database itu tanpa perlu
+   mengisi setelan apa pun. Itulah yang membuat `news-times-project.vercel.app` memakai database
+   pengembangan Orang 1, melanggar syarat nomor 6 di bagian 7.
+4. Menghapus barisnya tidak menyelesaikan masalah. Riwayat git, *fork*, dan cache GitHub tetap
+   menyimpannya. **String itu harus dianggap bocor selamanya.**
+
+**Cara mencegah terulang.** `getPrisma()` sekarang berhenti dengan pesan yang menyebutkan di mana
+`DATABASE_URL` seharusnya diisi. Kalau build serverless gagal karena variabel kosong, **isi
+variabelnya di dashboard, jangan tanam nilainya di kode.**
+
+**Penanganan:** ikuti urutan di [bagian 8](#8-kalau-ada-rahasia-yang-bocor) — ganti password Neon
+dulu, isi `DATABASE_URL` baru di Vercel, baru bersihkan riwayat kalau perlu.
+
+---
 
 ### K-1 — kenapa ini yang paling penting
 
@@ -231,10 +268,10 @@ Semua baris harus **PASS**. Yang belum dicek ditulis `NOT_RUN`, bukan dianggap l
 | 3 | Setiap Server Action penulis data memeriksa sesi sendiri | FAIL — `src/app/admin/actions.ts` punya 5 fungsi, tidak satu pun memeriksa sesi |
 | 4 | Setiap input dari luar divalidasi | FAIL — hanya pemeriksaan "tidak kosong" untuk judul dan isi |
 | 4a | Aturan "draft tidak bocor" diuji otomatis | **PASS** — 12 pengecekan di `verify:all` |
-| 5 | `DATA_SOURCE=prisma` di setelan produksi | NOT_RUN — belum deploy |
-| 6 | Database produksi terpisah dari database pengembangan | NOT_RUN — belum deploy |
-| 7 | Tidak ada rahasia di riwayat git | **PASS** |
-| 8 | Tidak ada akun contoh di database produksi | NOT_RUN — belum deploy |
+| 5 | `DATA_SOURCE=prisma` di setelan produksi | NOT_RUN — situs produksi membaca database, tapi setelan di dashboard Vercel belum diperiksa. Selama K-10 belum ditutup, sambungan bisa datang dari kode, bukan dari setelan |
+| 6 | Database produksi terpisah dari database pengembangan | **FAIL** — produksi memakai database pengembangan milik Orang 1 (lihat K-10) |
+| 7 | Tidak ada rahasia di riwayat git | **FAIL** sejak 21 Sep 2026 — lihat K-10 |
+| 8 | Tidak ada akun contoh di database produksi | NOT_RUN |
 | 9 | `npm audit` tidak punya temuan yang menyentuh jalur input pengunjung | **PASS** — keempat temuan di pohon CLI Prisma |
 | 10 | Branch `main` dikunci, wajib review | FAIL — belum dikunci |
 
